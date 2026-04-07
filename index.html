@@ -1839,7 +1839,10 @@ function applyState(state) {
   if (state.inputs) {
     Object.entries(state.inputs).forEach(([id, val]) => {
       const el = document.getElementById(id);
-      if (el) el.value = val;
+      if (el) {
+        const n = parseFloat(String(val).replace(/[^0-9.]/g, ''));
+        el.value = !isNaN(n) ? Math.round(n).toLocaleString('nb-NO') : val;
+      }
     });
   }
   const refill = document.getElementById('refillJun');
