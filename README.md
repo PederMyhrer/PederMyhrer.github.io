@@ -1821,7 +1821,8 @@ function getState() {
   const inputs = {};
   ['bsu1','bsu2','bsux1','bsux2','spare','bryllup','apr','mai','jun','jul','aug','snitt','egenkap'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) inputs[id] = el.value;
+    // Store as plain number string to avoid encoding issues with non-breaking spaces
+    if (el) inputs[id] = String(parseRaw(el.value) || 0);
   });
   const refill = document.getElementById('refillJun');
   return {
@@ -1838,7 +1839,10 @@ function applyState(state) {
   if (state.inputs) {
     Object.entries(state.inputs).forEach(([id, val]) => {
       const el = document.getElementById(id);
-      if (el) el.value = val;
+      if (el) {
+        const n = parseFloat(String(val).replace(/[^0-9.]/g, ''));
+        el.value = !isNaN(n) ? Math.round(n).toLocaleString('nb-NO') : val;
+      }
     });
   }
   const refill = document.getElementById('refillJun');
@@ -1890,7 +1894,9 @@ async function ghPull() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     ghFileSha = json.sha;
-    const data = JSON.parse(atob(json.content.replace(/\n/g, '')));
+    const raw = json.content.replace(/\n/g, '');
+    const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
+    const data = JSON.parse(new TextDecoder('utf-8').decode(bytes));
     applyState(data);
     saveState(); // sync to localStorage too
     // Re-render everything
@@ -1908,7 +1914,9 @@ async function ghPush() {
   if (status) status.textContent = '⏳ Lagrer...';
   try {
     const state = getState();
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
+    const jsonStr = JSON.stringify(state, null, 2);
+    const bytes2 = new TextEncoder().encode(jsonStr);
+    const encoded = btoa(String.fromCharCode(...bytes2));
     const body = { message: 'Oppdater data', content: encoded };
     if (ghFileSha) body.sha = ghFileSha;
     const res = await fetch(
