@@ -1,6 +1,6 @@
 {
   "inputs": {
-    "bsu1": "5",
+    "bsu1": "147 948",
     "bsu2": "125 605",
     "bsux1": "80 632",
     "bsux2": "139 957",
@@ -94,7 +94,7 @@
         },
         {
           "id": 5,
-          "name": "LÃ¥nekassen I",
+          "name": "LÃÂ¥nekassen I",
           "amounts": [
             0,
             0,
@@ -112,7 +112,7 @@
         },
         {
           "id": 6,
-          "name": "LÃ¥nekassen II",
+          "name": "LÃÂ¥nekassen II",
           "amounts": [
             0,
             0,
@@ -204,7 +204,7 @@
       "kostnader": [
         {
           "id": 1,
-          "name": "Husleie / boliglÃ¥n",
+          "name": "Husleie / boliglÃÂ¥n",
           "amounts": [
             0,
             0,
@@ -258,7 +258,7 @@
         },
         {
           "id": 4,
-          "name": "StrÃ¸m",
+          "name": "StrÃÂ¸m",
           "amounts": [
             0,
             0,
@@ -602,7 +602,7 @@
         },
         {
           "id": 7,
-          "name": "InteriÃ¸r",
+          "name": "InteriÃÂ¸r",
           "amounts": [
             0,
             0,
@@ -880,7 +880,7 @@
         },
         {
           "id": 5,
-          "name": "LÃ¥nekassen I",
+          "name": "LÃÂ¥nekassen I",
           "amounts": [
             0,
             0,
@@ -898,7 +898,7 @@
         },
         {
           "id": 6,
-          "name": "LÃ¥nekassen II",
+          "name": "LÃÂ¥nekassen II",
           "amounts": [
             0,
             0,
@@ -990,7 +990,7 @@
       "kostnader": [
         {
           "id": 1,
-          "name": "Husleie / boliglÃ¥n",
+          "name": "Husleie / boliglÃÂ¥n",
           "amounts": [
             0,
             0,
@@ -1044,7 +1044,7 @@
         },
         {
           "id": 4,
-          "name": "StrÃ¸m",
+          "name": "StrÃÂ¸m",
           "amounts": [
             0,
             0,
@@ -1388,7 +1388,7 @@
         },
         {
           "id": 7,
-          "name": "InteriÃ¸r",
+          "name": "InteriÃÂ¸r",
           "amounts": [
             0,
             0,
