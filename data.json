@@ -15,7 +15,64 @@
     "egenkap": "500000"
   },
   "refillJun": true,
-  "queueItems": [],
+  "queueItems": [
+    {
+      "id": 1775587275839,
+      "type": "wish",
+      "name": "Spisebord",
+      "amount": 5000,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775587373673,
+      "type": "buffer",
+      "name": "Buffer",
+      "amount": 25000,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775587403682,
+      "type": "wish",
+      "name": "Garderobeskap",
+      "amount": 10000,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775587411748,
+      "type": "wish",
+      "name": "Spisestoler",
+      "amount": 6000,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775587434409,
+      "type": "wish",
+      "name": "Ekstra seng",
+      "amount": 1000,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775587613981,
+      "type": "wish",
+      "name": "Gardiner med oppheng",
+      "amount": 1500,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775587766144,
+      "type": "wish",
+      "name": "Weber Grill",
+      "amount": 3790,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775588274996,
+      "type": "wish",
+      "name": "Utemøbler",
+      "amount": 5000,
+      "plannedMonth": ""
+    }
+  ],
   "ideas": [],
   "budgetData": {
     "2026": {
