@@ -12,7 +12,7 @@
     "jul": "45223",
     "aug": "47609",
     "snitt": "18773",
-    "egenkap": "560000"
+    "egenkap": "500000"
   },
   "refillJun": true,
   "queueItems": [],
@@ -76,7 +76,7 @@
         },
         {
           "id": 4,
-          "name": "Moertune",
+          "name": "Moertunet",
           "amounts": [
             0,
             0,
