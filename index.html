@@ -1841,7 +1841,12 @@ function applyState(state) {
       const el = document.getElementById(id);
       if (el) {
         const n = parseFloat(String(val).replace(/[^0-9.]/g, ''));
-        el.value = !isNaN(n) ? Math.round(n).toLocaleString('nb-NO') : val;
+        if (!isNaN(n) && n > 0) {
+          // Format with space as thousands separator (same as rest of app)
+          el.value = Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+        } else {
+          el.value = val;
+        }
       }
     });
   }
