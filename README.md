@@ -236,6 +236,8 @@ footer { font-size: 0.65rem; color: var(--text3); text-align: center; margin-top
   tr.bud-drag-over { box-shadow: 0 -2px 0 var(--accent); }
   .bud-fill-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 0.65rem; padding: 0 4px; letter-spacing: 0.03em; border-radius: 2px; }
   .bud-fill-btn:hover { background: var(--surface2); color: var(--accent); }
+  td:hover .bud-clear-btn { opacity: 1 !important; }
+  .bud-clear-btn:hover { color: var(--red) !important; }
   .pos { color: var(--green); } .neg { color: var(--red); }
   .zero-bar { display: flex; gap: 10px; flex-wrap: wrap; }
   .zero-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 4px; padding: 0.65rem 0.9rem; flex: 1; min-width: 120px; }
@@ -1494,17 +1496,16 @@ function budSetAmount(catId, rowId, mIdx, val) {
   if (row) { row.amounts[mIdx] = parseRaw(val) || 0; saveState(); renderBudgetTotals(); }
 }
 
-function budToggleFill(rowId) {
-  // Close all other fill popovers first
+function budToggleFill(uid) {
   document.querySelectorAll('[id^="fill-pop-"]').forEach(el => {
-    if (el.id !== 'fill-pop-' + rowId) el.style.display = 'none';
+    if (el.id !== 'fill-pop-' + uid) el.style.display = 'none';
   });
-  const pop = document.getElementById('fill-pop-' + rowId);
+  const pop = document.getElementById('fill-pop-' + uid);
   if (!pop) return;
   const isOpen = pop.style.display === 'flex';
   pop.style.display = isOpen ? 'none' : 'flex';
   if (!isOpen) {
-    setTimeout(() => { const inp = document.getElementById('fill-input-' + rowId); if (inp) inp.focus(); }, 50);
+    setTimeout(() => { const inp = document.getElementById('fill-input-' + uid); if (inp) inp.focus(); }, 50);
   }
 }
 
@@ -1515,12 +1516,18 @@ document.addEventListener('click', e => {
   }
 });
 
+function budClearMonth(catId, rowId, mIdx) {
+  const year = budGetYear();
+  const row = budgetData[year][catId].find(r => r.id === rowId);
+  if (row) { row.amounts[mIdx] = 0; saveState(); renderBudget(); }
+}
+
 function budFillRow(catId, rowId) {
   const year = budGetYear();
   const row = budgetData[year][catId].find(r => r.id === rowId);
   if (!row) return;
-  // Find the fill input for this row
-  const fillInput = document.getElementById('fill-input-' + rowId);
+  // Find the fill input for this row (compound ID: catId-rowId)
+  const fillInput = document.getElementById('fill-input-' + catId + '-' + rowId);
   if (!fillInput) return;
   const n = parseRaw(fillInput.value);
   if (isNaN(n) || n < 0) return;
@@ -1663,9 +1670,9 @@ function renderBudget() {
         <span class="bud-drag-handle" title="Dra for å flytte">⠿</span>
         <input class="bud-name-input" value="${row.name.replace(/"/g,'&quot;')}" placeholder="Navn..." onchange="budSetName('${cat.id}',${row.id},this.value)" style="flex:1;">
         <span style="position:relative;display:inline-block;">
-          <button class="bud-fill-btn" onclick="budToggleFill(${row.id})" title="Fyll alle måneder">⊞</button>
-          <span id="fill-pop-${row.id}" style="display:none;position:absolute;left:0;top:calc(100% + 4px);z-index:50;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:5px 6px;display:none;align-items:center;gap:4px;box-shadow:0 4px 12px rgba(0,0,0,0.1);white-space:nowrap;">
-            <input id="fill-input-${row.id}" class="bud-cell-input" style="width:70px;border-bottom-color:var(--border);" placeholder="beløp" onkeydown="if(event.key==='Enter'){budFillRow('${cat.id}',${row.id});}">
+          <button class="bud-fill-btn" onclick="budToggleFill('${cat.id}-${row.id}')" title="Fyll alle måneder">⊞</button>
+          <span id="fill-pop-${cat.id}-${row.id}" style="display:none;position:absolute;left:0;top:calc(100% + 4px);z-index:50;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:5px 6px;display:none;align-items:center;gap:4px;box-shadow:0 4px 12px rgba(0,0,0,0.1);white-space:nowrap;">
+            <input id="fill-input-${cat.id}-${row.id}" class="bud-cell-input" style="width:70px;border-bottom-color:var(--border);" placeholder="beløp" onkeydown="if(event.key==='Enter'){budFillRow('${cat.id}',${row.id});}">
             <button class="bud-fill-btn" style="color:var(--green);" onclick="budFillRow('${cat.id}',${row.id})">Fyll →</button>
           </span>
         </span>
@@ -1704,9 +1711,11 @@ function renderBudget() {
       visMon.forEach(mIdx => {
         const td = document.createElement('td');
         const val = row.amounts[mIdx];
+        td.style.position = 'relative';
         td.innerHTML = `<input class="bud-cell-input" value="${val > 0 ? Math.round(val).toLocaleString('nb-NO') : ''}" placeholder=""
           onchange="budSetAmount('${cat.id}',${row.id},${mIdx},this.value)"
-          onblur="if(this.value){const n=parseRaw(this.value);if(!isNaN(n)&&n>0)this.value=Math.round(n).toLocaleString('nb-NO');else this.value='';}">`;
+          onblur="if(this.value){const n=parseRaw(this.value);if(!isNaN(n)&&n>0)this.value=Math.round(n).toLocaleString('nb-NO');else this.value='';}">
+        ${val > 0 ? `<button onclick="budClearMonth('${cat.id}',${row.id},${mIdx})" style="position:absolute;right:0;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);font-size:0.65rem;cursor:pointer;padding:0 2px;opacity:0;transition:opacity 0.1s;" class="bud-clear-btn" title="Nullstill">×</button>` : ''}`;
         tr.appendChild(td);
       });
 
