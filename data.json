@@ -71,6 +71,13 @@
       "name": "Utemøbler",
       "amount": 5000,
       "plannedMonth": ""
+    },
+    {
+      "id": 1775588576784,
+      "type": "buffer",
+      "name": "Buffer",
+      "amount": 25000,
+      "plannedMonth": "Juni-2026"
     }
   ],
   "ideas": [],
