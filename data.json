@@ -1690,5 +1690,44 @@
         }
       ]
     }
-  }
+  },
+  "accounts": [
+    {
+      "id": 1,
+      "name": "BSU 1",
+      "value": 147948,
+      "type": "fri"
+    },
+    {
+      "id": 2,
+      "name": "BSU 2",
+      "value": 125605,
+      "type": "fri"
+    },
+    {
+      "id": 3,
+      "name": "BSU Ekstra 1",
+      "value": 83500,
+      "type": "fri"
+    },
+    {
+      "id": 4,
+      "name": "BSU Ekstra 2",
+      "value": 139957,
+      "type": "fri"
+    },
+    {
+      "id": 5,
+      "name": "Sparekonto",
+      "value": 10000,
+      "type": "fri"
+    },
+    {
+      "id": 6,
+      "name": "Bryllupskonto",
+      "value": 89428,
+      "type": "øremerket"
+    }
+  ],
+  "egenkap": "500000"
 }
