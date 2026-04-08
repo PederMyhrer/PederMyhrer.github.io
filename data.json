@@ -78,6 +78,13 @@
       "name": "Buffer",
       "amount": 25000,
       "plannedMonth": "Juni-2026"
+    },
+    {
+      "id": 1775634058904,
+      "type": "wish",
+      "name": "Bil",
+      "amount": 200000,
+      "plannedMonth": "Mai-2027"
     }
   ],
   "ideas": [],
@@ -86,7 +93,7 @@
       "inntekter": [
         {
           "id": 1,
-          "name": "Norges Bank",
+          "name": "Lønn Peder",
           "amounts": [
             14074,
             14314,
@@ -430,7 +437,7 @@
         },
         {
           "id": 10,
-          "name": "Macrofactor / Lifesum",
+          "name": "Macrofactor",
           "amounts": [
             0,
             0,
@@ -874,18 +881,18 @@
           "id": 1,
           "name": "Norges Bank",
           "amounts": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
+            39191,
+            39191,
+            39191,
+            39191,
+            39191,
+            39191,
+            39191,
+            39191,
+            39191,
+            39191,
+            39191,
+            39191
           ]
         },
         {
