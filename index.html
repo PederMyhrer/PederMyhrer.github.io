@@ -373,15 +373,7 @@ td:hover .bud-clear-btn { opacity: 1 !important; }
       </div>
 
       <div class="panel">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-          <p class="panel-title" style="margin:0;">Sparing per måned</p>
-          <select onchange="setSavingsYear(parseInt(this.value))"
-            style="font-family:var(--mono);font-size:0.68rem;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--text2);padding:2px 6px;cursor:pointer;">
-            <option value="2026">2026</option>
-            <option value="2027">2027</option>
-            <option value="2028">2028</option>
-          </select>
-        </div>
+        <p class="panel-title">Sparing per måned</p>
         <div id="savings-months-list"></div>
         <div style="margin-top:1.25rem; border-top:1px solid var(--surface2); padding-top:1rem;">
           <p class="panel-title">Innstillinger</p>
@@ -389,9 +381,13 @@ td:hover .bud-clear-btn { opacity: 1 !important; }
             <span class="input-label">Fyll bryllupskonto i juni</span>
             <label class="toggle"><input type="checkbox" id="refillJun" checked><span class="toggle-slider"></span></label>
           </div>
-          <div class="input-row" style="border-bottom:none; margin-top:0.1rem;">
+          <div class="input-row" style="margin-top:0.1rem;">
             <div class="input-label">Egenkapital til megler</div>
             <div class="input-wrap"><input type="text" id="egenkap" value="500 000"><span>kr</span></div>
+          </div>
+          <div class="input-row" style="border-bottom:none;">
+            <div class="input-label">Estimert sparing per mnd<small>brukes for måneder uten budsjettdata</small></div>
+            <div class="input-wrap"><input type="text" id="snitt-estimate" value="30 000"><span>kr</span></div>
           </div>
         </div>
       </div>
@@ -884,12 +880,11 @@ function renderAccounts() {
 }
 
 // ── SAVINGS DISPLAY ON OVERSIKT ──
-let savingsDisplayYear = 2026;
 const MONTH_NAMES = ['Januar','Februar','Mars','April','Mai','Juni','Juli','August','September','Oktober','November','Desember'];
 
-function setSavingsYear(yr) {
-  savingsDisplayYear = yr;
-  renderSavingsMonths();
+function getSavingsEstimate() {
+  const el = document.getElementById('snitt-estimate');
+  return el ? parseRaw(el.value) : 0;
 }
 
 function getBudgetSavingsPerMonth(year) {
@@ -900,28 +895,53 @@ function getBudgetSavingsPerMonth(year) {
 function renderSavingsMonths() {
   const container = document.getElementById('savings-months-list');
   if (!container) return;
-  const perMonth = getBudgetSavingsPerMonth(savingsDisplayYear);
-  const startIdx = savingsDisplayYear === 2026 ? 3 : 0; // April=3 for 2026, Januar for others
   container.innerHTML = '';
-  for (let i = startIdx; i < 12; i++) {
-    const val = perMonth[i];
+
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonth = now.getMonth(); // 0-indexed
+
+  const estimate = getSavingsEstimate();
+
+  // Build 6 months from budget
+  for (let offset = 0; offset < 6; offset++) {
+    const totalMonths = (curYear - 2026) * 12 + curMonth + offset;
+    const year = 2026 + Math.floor(totalMonths / 12);
+    const mIdx = totalMonths % 12;
+
+    const perMonth = getBudgetSavingsPerMonth(year);
+    const val = perMonth[mIdx];
+    const isEmpty = val === 0;
+
     const row = document.createElement('div');
     row.className = 'input-row';
-    const isEmpty = val === 0;
+    const isSpecial2026Apr = year === 2026 && mIdx === 3;
+    const isSpecial2026May = year === 2026 && mIdx === 4;
+
     row.innerHTML = `
-      <div class="input-label" style="color:${isEmpty?'var(--text3)':'var(--text2)'};">
-        ${MONTH_NAMES[i]}
-        ${i === 3 && savingsDisplayYear === 2026 ? '<small>april — før kjøp</small>' : ''}
-        ${i === 4 && savingsDisplayYear === 2026 ? '<small>kjøpsmåned</small>' : ''}
+      <div class="input-label">
+        ${MONTH_NAMES[mIdx]} ${year !== curYear ? year : ''}
+        ${isSpecial2026Apr ? '<small>før kjøp</small>' : ''}
+        ${isSpecial2026May ? '<small>kjøpsmåned</small>' : ''}
       </div>
-      <span style="font-size:0.8rem;font-weight:${isEmpty?'400':'500'};color:${isEmpty?'var(--text3)':'var(--green)'};white-space:nowrap;">
+      <span style="font-size:0.8rem;font-weight:${isEmpty?'400':'500'};color:${isEmpty?'var(--red)':'var(--green)'};white-space:nowrap;opacity:${isEmpty?'0.5':'1'};">
         ${isEmpty ? '—' : nbFmt(val)}
       </span>`;
     container.appendChild(row);
   }
-  if (container.children.length === 0) {
-    container.innerHTML = '<div style="font-size:0.72rem;color:var(--text3);padding:0.5rem 0;">Ingen sparetall lagt inn i budsjettet ennå</div>';
-  }
+
+  // Divider + estimate row
+  const divider = document.createElement('div');
+  divider.style.cssText = 'border-top:1px dashed var(--border);margin:0.5rem 0;';
+  container.appendChild(divider);
+
+  const estimateRow = document.createElement('div');
+  estimateRow.className = 'input-row';
+  estimateRow.style.borderBottom = 'none';
+  estimateRow.innerHTML = `
+    <div class="input-label" style="color:var(--text3);">Estimert, videre<small>fra budsjett eller ditt tall</small></div>
+    <span style="font-size:0.8rem;font-weight:500;color:var(--text3);white-space:nowrap;">${estimate > 0 ? nbFmt(estimate) : '—'}</span>`;
+  container.appendChild(estimateRow);
 }
 
 // ── SHARED MONTH BUILDER — reads savings from budgetData ──
@@ -929,13 +949,8 @@ function getSavingsForMonth(year, monthIdx) {
   const rows = (budgetData[year] && budgetData[year]['sparing']) || [];
   const fromBudget = rows.reduce((s, r) => s + (r.amounts[monthIdx] || 0), 0);
   if (fromBudget > 0) return fromBudget;
-  // Fallback: average of previous year if available
-  if (year > 2026) {
-    const prev = getBudgetSavingsPerMonth(year - 1);
-    const prevTotal = prev.reduce((s,v) => s+v, 0);
-    return Math.round(prevTotal / 12);
-  }
-  return 0;
+  // Fallback: user estimate
+  return getSavingsEstimate();
 }
 
 function buildMonths() {
@@ -1631,7 +1646,7 @@ function renderQueueTimeline() {
 document.getElementById('q-name').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); document.getElementById('q-amount').focus(); } });
 document.getElementById('q-amount').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); addQueueItem(); } });
 
-document.querySelectorAll('#egenkap').forEach(el => {
+document.querySelectorAll('#egenkap, #snitt-estimate').forEach(el => {
   el.addEventListener('blur', () => { formatField(el); saveState(); calc(); renderQueueTimeline(); });
   el.addEventListener('input', () => { saveState(); calc(); renderQueueTimeline(); });
 });
@@ -2100,10 +2115,12 @@ function ghInitBar() {
 
 function getState() {
   const egEl = document.getElementById('egenkap');
+  const snEl = document.getElementById('snitt-estimate');
   const refill = document.getElementById('refillJun');
   return {
     accounts,
     egenkap: egEl ? String(parseRaw(egEl.value) || 0) : '0',
+    snittEstimate: snEl ? String(parseRaw(snEl.value) || 0) : '0',
     refillJun: refill ? refill.checked : true,
     queueItems,
     ideas,
@@ -2136,6 +2153,15 @@ function applyState(state) {
         const n = parseFloat(String(i.egenkap).replace(/[^0-9.]/g,''));
         if (!isNaN(n)) el.value = Math.round(n).toLocaleString('nb-NO');
       }
+    }
+  }
+
+  // snitt-estimate
+  if (state.snittEstimate !== undefined) {
+    const el = document.getElementById('snitt-estimate');
+    if (el) {
+      const n = parseFloat(String(state.snittEstimate).replace(/[^0-9.]/g,''));
+      if (!isNaN(n) && n > 0) el.value = Math.round(n).toLocaleString('nb-NO');
     }
   }
 
