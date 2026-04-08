@@ -31,10 +31,17 @@
       "plannedMonth": ""
     },
     {
-      "id": 1775587403682,
+      "id": 1775643175863,
       "type": "wish",
-      "name": "Garderobeskap",
-      "amount": 10000,
+      "name": "Garderobe sov",
+      "amount": 12000,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775643161696,
+      "type": "wish",
+      "name": "Skapsystem for boden",
+      "amount": 1200,
       "plannedMonth": ""
     },
     {
@@ -71,20 +78,6 @@
       "name": "Utemøbler",
       "amount": 5000,
       "plannedMonth": ""
-    },
-    {
-      "id": 1775588576784,
-      "type": "buffer",
-      "name": "Buffer",
-      "amount": 25000,
-      "plannedMonth": "Juni-2026"
-    },
-    {
-      "id": 1775634058904,
-      "type": "wish",
-      "name": "Bil",
-      "amount": 200000,
-      "plannedMonth": "Mai-2027"
     }
   ],
   "ideas": [],
