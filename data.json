@@ -1,19 +1,43 @@
 {
-  "inputs": {
-    "bsu1": "147948",
-    "bsu2": "125605",
-    "bsux1": "83500",
-    "bsux2": "139957",
-    "spare": "10000",
-    "bryllup": "89428",
-    "apr": "30000",
-    "mai": "44515",
-    "jun": "51123",
-    "jul": "55196",
-    "aug": "58082",
-    "snitt": "31000",
-    "egenkap": "500000"
-  },
+  "accounts": [
+    {
+      "id": 1,
+      "name": "BSU 1",
+      "value": 147948,
+      "type": "fri"
+    },
+    {
+      "id": 2,
+      "name": "BSU 2",
+      "value": 125605,
+      "type": "fri"
+    },
+    {
+      "id": 3,
+      "name": "BSU Ekstra 1",
+      "value": 83500,
+      "type": "fri"
+    },
+    {
+      "id": 4,
+      "name": "BSU Ekstra 2",
+      "value": 139957,
+      "type": "fri"
+    },
+    {
+      "id": 5,
+      "name": "Sparekonto",
+      "value": 10000,
+      "type": "fri"
+    },
+    {
+      "id": 6,
+      "name": "Bryllupskonto",
+      "value": 89428,
+      "type": "øremerket"
+    }
+  ],
+  "egenkap": "500000",
   "refillJun": true,
   "queueItems": [
     {
@@ -111,8 +135,8 @@
             18500,
             20000,
             23000,
+            20000,
             40000,
-            25000,
             10000,
             10000,
             10000,
@@ -855,15 +879,15 @@
             20072,
             16461,
             10508,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
+            15000,
+            41078,
+            48236,
+            54946,
+            43654,
+            25572,
+            30124,
+            30223,
+            30723
           ]
         },
         {
@@ -873,7 +897,7 @@
             13929,
             13107,
             10508,
-            0,
+            15665,
             0,
             0,
             0,
@@ -1690,44 +1714,5 @@
         }
       ]
     }
-  },
-  "accounts": [
-    {
-      "id": 1,
-      "name": "BSU 1",
-      "value": 147948,
-      "type": "fri"
-    },
-    {
-      "id": 2,
-      "name": "BSU 2",
-      "value": 125605,
-      "type": "fri"
-    },
-    {
-      "id": 3,
-      "name": "BSU Ekstra 1",
-      "value": 83500,
-      "type": "fri"
-    },
-    {
-      "id": 4,
-      "name": "BSU Ekstra 2",
-      "value": 139957,
-      "type": "fri"
-    },
-    {
-      "id": 5,
-      "name": "Sparekonto",
-      "value": 10000,
-      "type": "fri"
-    },
-    {
-      "id": 6,
-      "name": "Bryllupskonto",
-      "value": 89428,
-      "type": "øremerket"
-    }
-  ],
-  "egenkap": "500000"
+  }
 }
