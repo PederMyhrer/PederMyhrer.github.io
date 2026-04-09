@@ -248,7 +248,29 @@ td:hover .bud-clear-btn { opacity: 1 !important; }
 .zero-card-val { font-size: 1rem; font-weight: 500; }
 .zero-card.highlight { border-color: var(--accent); }
 
-/* ── MOBIL ── */
+/* ── MÅNED-TAB ── */
+.mon-cat-header { font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--text3); padding:0.5rem 0 0.4rem; margin-top:1rem; border-bottom:1px solid var(--border); }
+.mon-cat-header:first-child { margin-top:0; }
+.mon-row { padding:0.38rem 0; border-bottom:0.5px solid var(--surface2); }
+.mon-row:last-child { border-bottom:none; }
+.mon-row.confirmed { background:var(--green-light); border-radius:3px; padding-left:6px; padding-right:6px; margin:0 -6px; }
+.mon-row-top { display:flex; align-items:center; gap:8px; }
+.mon-row-name { flex:1; color:var(--text2); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:0.78rem; }
+.mon-row-amount input { background:var(--surface2); border:1px solid var(--border); border-radius:3px; color:var(--text); font-family:var(--mono); font-size:0.78rem; padding:0.2rem 0.4rem; width:90px; text-align:right; }
+.mon-row-amount input:focus { outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+.mon-comment-btn { background:none; border:none; cursor:pointer; font-size:0.75rem; padding:0 2px; flex-shrink:0; line-height:1; opacity:0.4; transition:opacity 0.15s; color:var(--text2); }
+.mon-comment-btn:hover, .mon-comment-btn.has-comment { opacity:1; }
+.mon-comment-btn.has-comment { color:var(--accent); }
+.mon-comment-wrap { display:none; padding:2px 0 3px 0; }
+.mon-comment-wrap.open { display:block; }
+.mon-comment-wrap input { background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text2); font-family:var(--mono); font-size:0.7rem; width:100%; padding:2px 4px; }
+.mon-comment-wrap input:focus { outline:none; border-bottom-color:var(--accent); }
+.mon-comment-wrap input::placeholder { color:var(--text3); opacity:0.5; }
+.mon-check { width:15px; height:15px; accent-color:var(--green); cursor:pointer; flex-shrink:0; }
+.mon-cat-total { display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text3); padding:0.4rem 0 0; margin-top:0.1rem; border-top:1px solid var(--surface2); }
+
+/* Confirmed rows in budsjett table */
+.bud-table tr.bud-confirmed td { background:var(--green-light); }
 @media (max-width: 640px) {
   body { padding: 1rem 0.75rem 4rem; }
 
@@ -346,6 +368,7 @@ td:hover .bud-clear-btn { opacity: 1 !important; }
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('oversikt')">Oversikt</button>
     <button class="tab-btn" onclick="switchTab('budsjett')">Budsjett</button>
+    <button class="tab-btn" onclick="switchTab('måned')">Måned</button>
     <button class="tab-btn" onclick="switchTab('kø')">Prioriteringskø</button>
     <button class="tab-btn" onclick="switchTab('idéer')">Idéer</button>
   </div>
@@ -602,6 +625,31 @@ td:hover .bud-clear-btn { opacity: 1 !important; }
 
   </div>
 
+  <!-- TAB 5: MÅNED -->
+  <div id="tab-måned" class="tab-content">
+
+    <!-- Controls -->
+    <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+      <select id="mon-year" class="form-input" style="width:auto;" onchange="renderMåned()">
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+      </select>
+      <select id="mon-month" class="form-input" style="width:auto;" onchange="renderMåned()">
+        <option value="0">Januar</option><option value="1">Februar</option><option value="2">Mars</option>
+        <option value="3">April</option><option value="4">Mai</option><option value="5">Juni</option>
+        <option value="6">Juli</option><option value="7">August</option><option value="8">September</option>
+        <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
+      </select>
+    </div>
+
+    <!-- KPI bar -->
+    <div id="mon-kpi" style="margin-bottom:1.5rem;"></div>
+
+    <!-- Month detail -->
+    <div id="mon-detail"></div>
+
+  </div>
+
   <footer>Alle tall i NOK &nbsp;·&nbsp; Oppdateres automatisk</footer>
 </div>
 
@@ -618,11 +666,12 @@ function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  const tabs = ['oversikt','budsjett','kø','idéer']; const idx = tabs.indexOf(name);
+  const tabs = ['oversikt','budsjett','måned','kø','idéer']; const idx = tabs.indexOf(name);
   document.querySelectorAll('.tab-btn')[idx].classList.add('active');
   if (name === 'oversikt') { renderAccounts(); renderSavingsMonths(); }
   if (name === 'kø') { renderQueueTimeline(); if (window.Chart) updateCapitalChart(); }
   if (name === 'budsjett') renderBudget();
+  if (name === 'måned') renderMåned();
 }
 
 // ── IDÉER ──
@@ -1940,16 +1989,22 @@ function renderBudget() {
       const tr = document.createElement('tr');
       const uid = cat.id + '-' + row.id;
 
-      // Name cell — plain flex, no relative positioning needed for popovers
+      // Check if confirmed for the currently visible months — highlight if all visible months confirmed
+      const visibleConfirmed = budVisibleMonths.length === 1 &&
+        row.meta && row.meta[budVisibleMonths[0]] && row.meta[budVisibleMonths[0]].confirmed;
+      if (visibleConfirmed) tr.classList.add('bud-confirmed');
+
+      // Name cell
       const tdName = document.createElement('td');
-      tdName.style.display = 'flex';
-      tdName.style.alignItems = 'center';
-      tdName.style.gap = '4px';
       tdName.innerHTML = `
-        <span class="bud-drag-handle" title="Dra for å flytte">⠿</span>
-        <input class="bud-name-input" value="${row.name.replace(/"/g,'&quot;')}" placeholder="Navn..." onchange="budSetName('${cat.id}',${row.id},this.value)" style="flex:1;">
-        <button class="bud-fill-btn" data-fill-uid="${uid}" onclick="budToggleFill('${uid}')" title="Fyll alle måneder">⊞</button>
-        <button class="bud-del-btn" onclick="budRemoveRow('${cat.id}',${row.id})" title="Fjern">×</button>`;
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span class="bud-drag-handle" title="Dra for å flytte">⠿</span>
+          <input class="bud-name-input" value="${row.name.replace(/"/g,'&quot;')}" placeholder="Navn..." onchange="budSetName('${cat.id}',${row.id},this.value)" style="flex:1;">
+          <span style="position:relative;display:inline-block;">
+            <button class="bud-fill-btn" data-fill-uid="${uid}" onclick="budToggleFill('${uid}')" title="Fyll alle måneder">⊞</button>
+          </span>
+          <button class="bud-del-btn" onclick="budRemoveRow('${cat.id}',${row.id})" title="Fjern">×</button>
+        </div>`;
       tr.appendChild(tdName);
 
       // Create popover and append directly to body so it's never clipped
@@ -2077,7 +2132,177 @@ function renderBudget() {
   }
 }
 
-// ── STORAGE ──
+// ── MÅNED-TAB ──
+function monGetSel() {
+  const year = parseInt(document.getElementById('mon-year').value) || 2026;
+  const mIdx = parseInt(document.getElementById('mon-month').value) || 0;
+  return { year, mIdx };
+}
+
+function monEnsureMeta(year, catId, rowId, mIdx) {
+  const yr = budgetData[year];
+  if (!yr) return;
+  const rows = yr[catId] || [];
+  const row = rows.find(r => r.id === rowId);
+  if (!row) return;
+  if (!row.meta) row.meta = {};
+  if (!row.meta[mIdx]) row.meta[mIdx] = { confirmed: false, comment: '' };
+  return row.meta[mIdx];
+}
+
+function monSetConfirmed(year, catId, rowId, mIdx, val) {
+  const meta = monEnsureMeta(year, catId, rowId, mIdx);
+  if (meta) { meta.confirmed = val; saveState(); renderMåned(); renderBudgetIfActive(); }
+}
+
+function monSetComment(year, catId, rowId, mIdx, val) {
+  const meta = monEnsureMeta(year, catId, rowId, mIdx);
+  if (meta) { meta.comment = val; saveState(); }
+}
+
+function monSetAmount(year, catId, rowId, mIdx, val) {
+  budEnsureYear(year);
+  const row = budgetData[year][catId].find(r => r.id === rowId);
+  if (row) { row.amounts[mIdx] = parseRaw(val) || 0; saveState(); renderMåned(); renderBudgetIfActive(); }
+}
+
+function renderBudgetIfActive() {
+  if (document.getElementById('tab-budsjett').classList.contains('active')) renderBudget();
+}
+
+function renderMåned() {
+  const { year, mIdx } = monGetSel();
+  budEnsureYear(year);
+
+  // Sync selects to current month by default on first open
+  const kpiEl = document.getElementById('mon-kpi');
+  const detailEl = document.getElementById('mon-detail');
+  if (!kpiEl || !detailEl) return;
+
+  // Calculate KPIs
+  let totalIn = 0, totalOut = 0, totalSaving = 0;
+  BUD_CATS.forEach(cat => {
+    const rows = budgetData[year][cat.id] || [];
+    const sum = rows.reduce((s, r) => s + (r.amounts[mIdx] || 0), 0);
+    if (cat.id === 'inntekter') totalIn = sum;
+    else if (cat.id === 'sparing') totalSaving = sum;
+    else totalOut += sum;
+  });
+  const tilFordeling = totalIn - totalOut - totalSaving;
+
+  kpiEl.innerHTML = `<div class="zero-bar">
+    <div class="zero-card" style="border-color:var(--green);background:var(--green-bg);flex:0 0 auto;">
+      <div class="zero-card-label" style="color:var(--green);">Sparing</div>
+      <div class="zero-card-val" style="color:var(--green);font-size:1rem;">${Math.round(totalSaving).toLocaleString('nb-NO')} kr</div>
+    </div>
+    <div class="zero-card highlight">
+      <div class="zero-card-label">Til fordeling</div>
+      <div class="zero-card-val ${tilFordeling>=0?'pos':'neg'}" style="font-size:1rem;">${Math.round(tilFordeling).toLocaleString('nb-NO')} kr</div>
+    </div>
+    <div class="zero-card">
+      <div class="zero-card-label">Inntekter</div>
+      <div class="zero-card-val" style="color:var(--text2);font-size:0.9rem;">${Math.round(totalIn).toLocaleString('nb-NO')} kr</div>
+    </div>
+    <div class="zero-card">
+      <div class="zero-card-label">Kostnader</div>
+      <div class="zero-card-val" style="color:var(--text2);font-size:0.9rem;">${Math.round(totalOut).toLocaleString('nb-NO')} kr</div>
+    </div>
+  </div>`;
+
+  // Detail sections
+  detailEl.innerHTML = '';
+  BUD_CATS.forEach(cat => {
+    const rows = budgetData[year][cat.id] || [];
+    const catSum = rows.reduce((s, r) => s + (r.amounts[mIdx] || 0), 0);
+
+    const section = document.createElement('div');
+    section.className = 'panel';
+    section.style.marginBottom = '0.75rem';
+
+    const header = document.createElement('div');
+    header.className = 'mon-cat-header';
+    header.style.marginTop = '0';
+    header.textContent = cat.label;
+    section.appendChild(header);
+
+    rows.forEach(row => {
+      const val = row.amounts[mIdx] || 0;
+      const meta = (row.meta && row.meta[mIdx]) || { confirmed: false, comment: '' };
+      const isConfirmed = meta.confirmed;
+      const hasComment = !!(meta.comment && meta.comment.trim());
+
+      const div = document.createElement('div');
+      div.className = 'mon-row' + (isConfirmed ? ' confirmed' : '');
+
+      // Top line: checkbox + name + comment-btn + amount
+      const top = document.createElement('div');
+      top.className = 'mon-row-top';
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'mon-check';
+      cb.checked = isConfirmed;
+      cb.addEventListener('change', () => monSetConfirmed(year, cat.id, row.id, mIdx, cb.checked));
+      top.appendChild(cb);
+
+      const name = document.createElement('span');
+      name.className = 'mon-row-name';
+      name.textContent = row.name || '—';
+      top.appendChild(name);
+
+      // Comment toggle button
+      const commentWrap = document.createElement('div');
+      commentWrap.className = 'mon-comment-wrap' + (hasComment ? ' open' : '');
+      const commentInput = document.createElement('input');
+      commentInput.type = 'text';
+      commentInput.placeholder = 'skriv notat...';
+      commentInput.value = meta.comment || '';
+      commentInput.addEventListener('change', () => {
+        monSetComment(year, cat.id, row.id, mIdx, commentInput.value);
+        const nowHas = !!commentInput.value.trim();
+        commentBtn.classList.toggle('has-comment', nowHas);
+      });
+      commentWrap.appendChild(commentInput);
+
+      const commentBtn = document.createElement('button');
+      commentBtn.className = 'mon-comment-btn' + (hasComment ? ' has-comment' : '');
+      commentBtn.title = hasComment ? meta.comment : 'Legg til notat';
+      commentBtn.textContent = '✎';
+      commentBtn.addEventListener('click', () => {
+        const isOpen = commentWrap.classList.toggle('open');
+        if (isOpen) setTimeout(() => commentInput.focus(), 50);
+      });
+      top.appendChild(commentBtn);
+
+      const amtWrap = document.createElement('div');
+      amtWrap.className = 'mon-row-amount';
+      const amtInput = document.createElement('input');
+      amtInput.type = 'text';
+      amtInput.value = val > 0 ? Math.round(val).toLocaleString('nb-NO') : '';
+      amtInput.placeholder = '0';
+      amtInput.addEventListener('change', () => {
+        monSetAmount(year, cat.id, row.id, mIdx, amtInput.value);
+        const n = parseRaw(amtInput.value);
+        if (!isNaN(n) && n > 0) amtInput.value = Math.round(n).toLocaleString('nb-NO');
+        else amtInput.value = '';
+      });
+      amtWrap.appendChild(amtInput);
+      top.appendChild(amtWrap);
+
+      div.appendChild(top);
+      div.appendChild(commentWrap);
+      section.appendChild(div);
+    });
+
+    // Category total
+    const total = document.createElement('div');
+    total.className = 'mon-cat-total';
+    total.innerHTML = `<span>Sum ${cat.label.toLowerCase()}</span><span>${catSum > 0 ? Math.round(catSum).toLocaleString('nb-NO') + '\u00a0kr' : '—'}</span>`;
+    section.appendChild(total);
+
+    detailEl.appendChild(section);
+  });
+}
 const LS_KEY   = 'spareoversikt_v2';
 const GH_OWNER = 'PederMyhrer';
 const GH_REPO  = 'PederMyhrer.github.io';
@@ -2264,6 +2489,14 @@ async function ghPush() {
 // Init
 loadState();
 ghInitBar();
+// Set måned-tab selects to current month
+(function() {
+  const now = new Date();
+  const yr = document.getElementById('mon-year');
+  const mo = document.getElementById('mon-month');
+  if (yr) yr.value = String(now.getFullYear());
+  if (mo) mo.value = String(now.getMonth());
+})();
 calc();
 renderQueue();
 renderIdeas();
