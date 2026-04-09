@@ -384,7 +384,7 @@ td:hover .bud-clear-btn { opacity: 1 !important; }
         </div>
         <div id="accounts-list"></div>
         <div id="accounts-add-row" style="display:none;margin-top:0.5rem;">
-          <button onclick="addAccount()" style="background:none;border:1px dashed var(--border);border-radius:3px;color:var(--text3);font-family:var(--mono);font-size:0.68rem;padding:3px 10px;cursor:pointer;width:100%;">+ Legg til konto</button>
+          <button onclick="addAccountToRegistry()" style="background:none;border:1px dashed var(--border);border-radius:3px;color:var(--text3);font-family:var(--mono);font-size:0.68rem;padding:3px 10px;cursor:pointer;width:100%;">+ Legg til konto</button>
         </div>
         <div class="account-total-row">
           <span class="account-total-label">Sum kontoer</span>
@@ -829,36 +829,91 @@ document.getElementById('idea-price').addEventListener('blur', () => {
   if (n > 0) el.value = Math.round(n).toLocaleString('nb-NO');
 });
 
-// ── ACCOUNTS STATE ──
-const DEFAULT_ACCOUNTS = [
-  { id: 1, name: 'BSU 1',       value: 147948, type: 'fri' },
-  { id: 2, name: 'BSU 2',       value: 125605, type: 'fri' },
-  { id: 3, name: 'BSU Ekstra 1',value: 83500,  type: 'fri' },
-  { id: 4, name: 'BSU Ekstra 2',value: 139957, type: 'fri' },
-  { id: 5, name: 'Sparekonto',   value: 10000,  type: 'fri' },
-  { id: 6, name: 'Bryllupskonto',value: 89428,  type: 'øremerket' },
+// ── ACCOUNTS REGISTRY ──
+// Accounts are driven by budgetData[year]['sparing'] rows with accountId links.
+// startSaldoDate and per-account startSaldo live in accountRegistry.
+// Computed saldo = startSaldo + sum of confirmed sparing for that account.
+
+let accountRegistry = [
+  { id: 1, name: 'BSU P',          earmarked: false, startSaldo: 147948 },
+  { id: 2, name: 'BSU V',          earmarked: false, startSaldo: 125605 },
+  { id: 3, name: 'BSU Extra P',    earmarked: false, startSaldo: 83500  },
+  { id: 4, name: 'BSU Extra V',    earmarked: false, startSaldo: 139957 },
+  { id: 5, name: 'Emergency Fund', earmarked: false, startSaldo: 10000  },
+  { id: 6, name: 'Bryllup',        earmarked: true,  startSaldo: 89428  },
 ];
-let accounts = DEFAULT_ACCOUNTS.map(a => ({...a}));
+let startSaldoDate = '2026-04-01';
 
-function accountsTotal() { return accounts.reduce((s,a) => s + a.value, 0); }
-function accountsFree()  { return accounts.filter(a => a.type === 'fri').reduce((s,a) => s + a.value, 0); }
-function accountsEarmarked() { return accounts.filter(a => a.type === 'øremerket').reduce((s,a) => s + a.value, 0); }
-function earmarkedAccount() { return accounts.find(a => a.type === 'øremerket') || null; }
-
-function addAccount() {
-  accounts.push({ id: Date.now(), name: 'Ny konto', value: 0, type: 'fri' });
-  saveState(); renderAccounts(); calc();
+// Compute confirmed sparing per account across all confirmed months
+function getConfirmedSparingPerAccount() {
+  const totals = {};
+  accountRegistry.forEach(a => totals[a.id] = 0);
+  Object.keys(budgetData).forEach(year => {
+    const sparingRows = (budgetData[year] && budgetData[year]['sparing']) || [];
+    sparingRows.forEach(row => {
+      if (!row.accountId || !row.meta) return;
+      Object.entries(row.meta).forEach(([mIdx, meta]) => {
+        if (meta.confirmed && row.amounts[parseInt(mIdx)]) {
+          if (totals[row.accountId] !== undefined) {
+            totals[row.accountId] += row.amounts[parseInt(mIdx)];
+          }
+        }
+      });
+    });
+  });
+  return totals;
 }
 
-function removeAccount(id) {
-  if (accounts.length <= 1) return;
-  accounts = accounts.filter(a => a.id !== id);
-  saveState(); renderAccounts(); calc();
+function getComputedSaldo(accountId) {
+  const acc = accountRegistry.find(a => a.id === accountId);
+  if (!acc) return 0;
+  const confirmed = getConfirmedSparingPerAccount();
+  return acc.startSaldo + (confirmed[accountId] || 0);
 }
 
-function setAccountType(id, type) {
-  const a = accounts.find(a => a.id === id);
-  if (a) { a.type = type; saveState(); renderAccounts(); calc(); }
+function accountsTotal() {
+  return accountRegistry.reduce((s, a) => s + getComputedSaldo(a.id), 0);
+}
+function accountsFree() {
+  return accountRegistry.filter(a => !a.earmarked).reduce((s, a) => s + getComputedSaldo(a.id), 0);
+}
+function accountsEarmarked() {
+  return accountRegistry.filter(a => a.earmarked).reduce((s, a) => s + getComputedSaldo(a.id), 0);
+}
+
+// Ensure sparing rows exist for all accounts in a given year
+function ensureSparingRowsForAccounts(year) {
+  budEnsureYear(year);
+  const rows = budgetData[year]['sparing'];
+  accountRegistry.forEach(acc => {
+    const exists = rows.find(r => r.accountId === acc.id);
+    if (!exists) {
+      rows.push({ id: Date.now() + Math.random(), name: acc.name, accountId: acc.id, amounts: Array(12).fill(0) });
+    } else {
+      // Keep name in sync
+      exists.name = acc.name;
+    }
+  });
+}
+
+function addAccountToRegistry() {
+  const id = Date.now();
+  accountRegistry.push({ id, name: 'Ny konto', earmarked: false, startSaldo: 0 });
+  // Add sparing row for this account in all existing budget years
+  Object.keys(budgetData).forEach(year => ensureSparingRowsForAccounts(parseInt(year)));
+  saveState(); renderAccounts(); renderBudgetIfActive(); calc();
+}
+
+function removeAccountFromRegistry(id) {
+  if (accountRegistry.length <= 1) return;
+  accountRegistry = accountRegistry.filter(a => a.id !== id);
+  // Remove linked sparing rows too
+  Object.keys(budgetData).forEach(year => {
+    if (budgetData[year] && budgetData[year]['sparing']) {
+      budgetData[year]['sparing'] = budgetData[year]['sparing'].filter(r => r.accountId !== id);
+    }
+  });
+  saveState(); renderAccounts(); renderBudgetIfActive(); calc();
 }
 
 let accountsEditMode = false;
@@ -882,50 +937,71 @@ function renderAccounts() {
   if (!list) return;
   list.innerHTML = '';
 
-  accounts.forEach(acc => {
-    const isEarmarked = acc.type === 'øremerket';
+  const confirmed = getConfirmedSparingPerAccount();
+
+  accountRegistry.forEach(acc => {
+    const saldo = getComputedSaldo(acc.id);
+    const confirmedAmt = confirmed[acc.id] || 0;
     const row = document.createElement('div');
     row.className = 'input-row';
 
     if (accountsEditMode) {
-      // Edit mode: name input, øremerket toggle, value input, delete
       row.innerHTML = `
         <div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;">
           <input type="text" value="${acc.name.replace(/"/g,'&quot;')}"
-            class="bud-name-input"
-            style="flex:1;font-size:0.78rem;"
-            onchange="accounts.find(a=>a.id===${acc.id}).name=this.value;saveState();calc();">
-          <button onclick="setAccountType(${acc.id},'${isEarmarked?'fri':'øremerket'}')"
+            class="bud-name-input" style="flex:1;font-size:0.78rem;"
+            onchange="
+              accountRegistry.find(a=>a.id===${acc.id}).name=this.value;
+              Object.keys(budgetData).forEach(yr=>{
+                const r=(budgetData[yr]&&budgetData[yr].sparing||[]).find(r=>r.accountId===${acc.id});
+                if(r)r.name=this.value;
+              });
+              saveState();renderAccounts();renderBudgetIfActive();">
+          <button onclick="
+              const a=accountRegistry.find(a=>a.id===${acc.id});
+              a.earmarked=!a.earmarked;
+              saveState();renderAccounts();calc();"
             style="font-family:var(--mono);font-size:0.58rem;padding:2px 7px;border-radius:2px;white-space:nowrap;flex-shrink:0;cursor:pointer;
-              border:1px solid ${isEarmarked?'var(--amber)':'var(--border)'};
-              background:${isEarmarked?'var(--amber-bg)':'transparent'};
-              color:${isEarmarked?'var(--amber)':'var(--text3)'};">
-            ${isEarmarked?'øremerket':'fri'}
+              border:1px solid ${acc.earmarked?'var(--amber)':'var(--border)'};
+              background:${acc.earmarked?'var(--amber-bg)':'transparent'};
+              color:${acc.earmarked?'var(--amber)':'var(--text3)'};">
+            ${acc.earmarked?'øremerket':'fri'}
           </button>
         </div>
         <div class="input-wrap" style="flex-shrink:0;margin-left:8px;">
-          <input type="text" value="${Math.round(acc.value).toLocaleString('nb-NO')}"
+          <input type="text" value="${Math.round(acc.startSaldo).toLocaleString('nb-NO')}"
+            title="Startsaldo per ${startSaldoDate}"
             style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.3rem 2rem 0.3rem 0.5rem;width:110px;text-align:right;"
-            onchange="const n=parseRaw(this.value);if(!isNaN(n)){accounts.find(a=>a.id===${acc.id}).value=n;this.value=Math.round(n).toLocaleString('nb-NO');saveState();calc();}">
+            onchange="const n=parseRaw(this.value);if(!isNaN(n)){accountRegistry.find(a=>a.id===${acc.id}).startSaldo=n;this.value=Math.round(n).toLocaleString('nb-NO');saveState();calc();}">
           <span>kr</span>
         </div>
-        <button onclick="removeAccount(${acc.id})"
-          style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.9rem;padding:0 2px 0 6px;flex-shrink:0;" title="Fjern">×</button>`;
+        <button onclick="removeAccountFromRegistry(${acc.id})"
+          style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.9rem;padding:0 2px 0 6px;flex-shrink:0;">×</button>`;
     } else {
-      // View mode: clean name + optional øremerket note, right-aligned value
       row.innerHTML = `
         <div class="input-label">
           ${acc.name}
-          ${isEarmarked ? '<small>øremerket</small>' : ''}
+          ${acc.earmarked ? '<small>øremerket</small>' : ''}
+          ${confirmedAmt > 0 ? `<small style="color:var(--green);">+${Math.round(confirmedAmt).toLocaleString('nb-NO')} bekreftet</small>` : ''}
         </div>
-        <span style="font-size:0.8rem;font-weight:500;color:var(--text2);white-space:nowrap;">${nbFmt(acc.value)}</span>`;
+        <span style="font-size:0.8rem;font-weight:500;color:var(--text2);white-space:nowrap;">${nbFmt(saldo)}</span>`;
     }
 
     list.appendChild(row);
   });
 
+  // Verify hint: show if total differs from budget start
   const sumEl = document.getElementById('account-sum');
   if (sumEl) sumEl.textContent = nbFmt(accountsTotal());
+
+  const hintEl = document.getElementById('match-hint');
+  if (hintEl && accountsEditMode) {
+    hintEl.textContent = `Startsaldo per ${startSaldoDate}`;
+    hintEl.className = 'match-hint';
+    hintEl.style.color = 'var(--text3)';
+  } else if (hintEl) {
+    hintEl.textContent = '';
+  }
 }
 
 // ── SAVINGS DISPLAY ON OVERSIKT ──
@@ -1003,8 +1079,8 @@ function getSavingsForMonth(year, monthIdx) {
 }
 
 function buildMonths() {
-  const freeToday = accountsFree();
-  const bryllup   = accountsEarmarked();
+  const freeToday = accountsFree();   // startSaldo + confirmed sparing, free accounts only
+  const bryllup   = accountsEarmarked(); // earmarked accounts
   const egenkap   = parseVal('egenkap');
   const refillJun = document.getElementById('refillJun').checked;
 
@@ -2343,7 +2419,8 @@ function getState() {
   const snEl = document.getElementById('snitt-estimate');
   const refill = document.getElementById('refillJun');
   return {
-    accounts,
+    accountRegistry,
+    startSaldoDate,
     egenkap: egEl ? String(parseRaw(egEl.value) || 0) : '0',
     snittEstimate: snEl ? String(parseRaw(snEl.value) || 0) : '0',
     refillJun: refill ? refill.checked : true,
@@ -2356,48 +2433,43 @@ function getState() {
 function applyState(state) {
   if (!state) return;
 
-  // Migrate old inputs format → accounts
-  if (state.accounts && Array.isArray(state.accounts) && state.accounts.length > 0) {
-    accounts = state.accounts;
+  // Load accountRegistry (new format)
+  if (state.accountRegistry && Array.isArray(state.accountRegistry) && state.accountRegistry.length > 0) {
+    accountRegistry = state.accountRegistry;
+  } else if (state.accounts && Array.isArray(state.accounts) && state.accounts.length > 0) {
+    // Migrate from intermediate accounts format
+    accountRegistry = state.accounts.map(a => ({
+      id: a.id,
+      name: a.name,
+      earmarked: a.earmarked || a.type === 'øremerket' || false,
+      startSaldo: a.startSaldo || a.value || 0,
+    }));
   } else if (state.inputs) {
-    // Legacy migration: build accounts from old bsu1/bsu2 etc fields
+    // Legacy migration from original bsu1/bsu2 format
     const i = state.inputs;
     const parse = v => parseFloat(String(v||0).replace(/[^0-9.]/g,'')) || 0;
-    accounts = [
-      { id:1, name:'BSU 1',        value: parse(i.bsu1),   type:'fri' },
-      { id:2, name:'BSU 2',        value: parse(i.bsu2),   type:'fri' },
-      { id:3, name:'BSU Ekstra 1', value: parse(i.bsux1),  type:'fri' },
-      { id:4, name:'BSU Ekstra 2', value: parse(i.bsux2),  type:'fri' },
-      { id:5, name:'Sparekonto',   value: parse(i.spare),  type:'fri' },
-      { id:6, name:'Bryllupskonto',value: parse(i.bryllup),type:'øremerket' },
-    ].filter(a => a.value > 0 || a.id <= 6);
-    // Also apply egenkap if present
-    if (i.egenkap) {
-      const el = document.getElementById('egenkap');
-      if (el) {
-        const n = parseFloat(String(i.egenkap).replace(/[^0-9.]/g,''));
-        if (!isNaN(n)) el.value = Math.round(n).toLocaleString('nb-NO');
-      }
-    }
+    accountRegistry = [
+      { id:1, name:'BSU P',          earmarked:false, startSaldo: parse(i.bsu1)   },
+      { id:2, name:'BSU V',          earmarked:false, startSaldo: parse(i.bsu2)   },
+      { id:3, name:'BSU Extra P',    earmarked:false, startSaldo: parse(i.bsux1)  },
+      { id:4, name:'BSU Extra V',    earmarked:false, startSaldo: parse(i.bsux2)  },
+      { id:5, name:'Emergency Fund', earmarked:false, startSaldo: parse(i.spare)  },
+      { id:6, name:'Bryllup',        earmarked:true,  startSaldo: parse(i.bryllup)},
+    ];
   }
 
-  // snitt-estimate
-  if (state.snittEstimate !== undefined) {
-    const el = document.getElementById('snitt-estimate');
-    if (el) {
-      const n = parseFloat(String(state.snittEstimate).replace(/[^0-9.]/g,''));
-      if (!isNaN(n) && n > 0) el.value = Math.round(n).toLocaleString('nb-NO');
-    }
-  }
+  if (state.startSaldoDate) startSaldoDate = state.startSaldoDate;
 
   // egenkap
-  if (state.egenkap !== undefined) {
-    const el = document.getElementById('egenkap');
-    if (el) {
-      const n = parseFloat(String(state.egenkap).replace(/[^0-9.]/g,''));
+  const applyInput = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined) {
+      const n = parseFloat(String(val).replace(/[^0-9.]/g,''));
       if (!isNaN(n) && n > 0) el.value = Math.round(n).toLocaleString('nb-NO');
     }
-  }
+  };
+  applyInput('egenkap', state.egenkap || (state.inputs && state.inputs.egenkap));
+  applyInput('snitt-estimate', state.snittEstimate);
 
   const refill = document.getElementById('refillJun');
   if (refill && state.refillJun !== undefined) refill.checked = state.refillJun;
@@ -2413,6 +2485,8 @@ function applyState(state) {
         }
       });
     });
+    // Ensure sparing rows exist for all registered accounts
+    Object.keys(budgetData).forEach(year => ensureSparingRowsForAccounts(parseInt(year)));
   }
 }
 
