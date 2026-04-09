@@ -1,43 +1,19 @@
 {
-  "accounts": [
-    {
-      "id": 1,
-      "name": "BSU 1",
-      "value": 147948,
-      "type": "fri"
-    },
-    {
-      "id": 2,
-      "name": "BSU 2",
-      "value": 125605,
-      "type": "fri"
-    },
-    {
-      "id": 3,
-      "name": "BSU Ekstra 1",
-      "value": 83500,
-      "type": "fri"
-    },
-    {
-      "id": 4,
-      "name": "BSU Ekstra 2",
-      "value": 139957,
-      "type": "fri"
-    },
-    {
-      "id": 5,
-      "name": "Sparekonto",
-      "value": 10000,
-      "type": "fri"
-    },
-    {
-      "id": 6,
-      "name": "Bryllupskonto",
-      "value": 89428,
-      "type": "øremerket"
-    }
-  ],
-  "egenkap": "500000",
+  "inputs": {
+    "bsu1": "147948",
+    "bsu2": "125605",
+    "bsux1": "83500",
+    "bsux2": "139957",
+    "spare": "10000",
+    "bryllup": "89428",
+    "apr": "30000",
+    "mai": "44515",
+    "jun": "51123",
+    "jul": "55196",
+    "aug": "58082",
+    "snitt": "31000",
+    "egenkap": "500000"
+  },
   "refillJun": true,
   "queueItems": [
     {
@@ -135,8 +111,8 @@
             18500,
             20000,
             23000,
-            20000,
             40000,
+            25000,
             10000,
             10000,
             10000,
@@ -852,7 +828,8 @@
             0,
             0,
             0
-          ]
+          ],
+          "accountId": 1
         },
         {
           "id": 2,
@@ -870,7 +847,8 @@
             0,
             0,
             0
-          ]
+          ],
+          "accountId": 2
         },
         {
           "id": 3,
@@ -879,25 +857,7 @@
             20072,
             16461,
             10508,
-            15000,
-            41078,
-            48236,
-            54946,
-            43654,
-            25572,
-            30124,
-            30223,
-            30723
-          ]
-        },
-        {
-          "id": 4,
-          "name": "BSU Extra V",
-          "amounts": [
-            13929,
-            13107,
-            10508,
-            15665,
+            0,
             0,
             0,
             0,
@@ -906,7 +866,27 @@
             0,
             0,
             0
-          ]
+          ],
+          "accountId": 3
+        },
+        {
+          "id": 4,
+          "name": "BSU Extra V",
+          "amounts": [
+            13929,
+            13107,
+            10508,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "accountId": 4
         },
         {
           "id": 5,
@@ -914,6 +894,26 @@
           "amounts": [
             1361,
             6000,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "accountId": 5
+        },
+        {
+          "id": 1775719615417.514,
+          "name": "Bryllup",
+          "accountId": 6,
+          "amounts": [
+            0,
+            0,
             0,
             0,
             0,
@@ -1638,7 +1638,8 @@
             0,
             0,
             0
-          ]
+          ],
+          "accountId": 1
         },
         {
           "id": 2,
@@ -1656,7 +1657,8 @@
             0,
             0,
             0
-          ]
+          ],
+          "accountId": 2
         },
         {
           "id": 3,
@@ -1674,7 +1676,8 @@
             0,
             0,
             0
-          ]
+          ],
+          "accountId": 3
         },
         {
           "id": 4,
@@ -1692,7 +1695,8 @@
             0,
             0,
             0
-          ]
+          ],
+          "accountId": 4
         },
         {
           "id": 5,
@@ -1710,9 +1714,68 @@
             0,
             0,
             0
+          ],
+          "accountId": 5
+        },
+        {
+          "id": 1775719615417.8442,
+          "name": "Bryllup",
+          "accountId": 6,
+          "amounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
           ]
         }
       ]
     }
-  }
+  },
+  "accounts": [
+    {
+      "id": 1,
+      "name": "BSU P",
+      "earmarked": false,
+      "startSaldo": 147948
+    },
+    {
+      "id": 2,
+      "name": "BSU V",
+      "earmarked": false,
+      "startSaldo": 125605
+    },
+    {
+      "id": 3,
+      "name": "BSU Extra P",
+      "earmarked": false,
+      "startSaldo": 83500
+    },
+    {
+      "id": 4,
+      "name": "BSU Extra V",
+      "earmarked": false,
+      "startSaldo": 139957
+    },
+    {
+      "id": 5,
+      "name": "Emergency Fund",
+      "earmarked": false,
+      "startSaldo": 10000
+    },
+    {
+      "id": 6,
+      "name": "Bryllup",
+      "earmarked": true,
+      "startSaldo": 89428
+    }
+  ],
+  "startSaldoDate": "2026-04-01"
 }
