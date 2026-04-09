@@ -1,19 +1,45 @@
 {
-  "inputs": {
-    "bsu1": "147948",
-    "bsu2": "125605",
-    "bsux1": "83500",
-    "bsux2": "139957",
-    "spare": "10000",
-    "bryllup": "89428",
-    "apr": "30000",
-    "mai": "44515",
-    "jun": "51123",
-    "jul": "55196",
-    "aug": "58082",
-    "snitt": "31000",
-    "egenkap": "500000"
-  },
+  "accountRegistry": [
+    {
+      "id": 1,
+      "name": "BSU P",
+      "earmarked": false,
+      "startSaldo": 147948
+    },
+    {
+      "id": 2,
+      "name": "BSU V",
+      "earmarked": false,
+      "startSaldo": 125605
+    },
+    {
+      "id": 3,
+      "name": "BSU Extra P",
+      "earmarked": false,
+      "startSaldo": 83500
+    },
+    {
+      "id": 4,
+      "name": "BSU Extra V",
+      "earmarked": false,
+      "startSaldo": 139957
+    },
+    {
+      "id": 5,
+      "name": "Emergency Fund",
+      "earmarked": false,
+      "startSaldo": 10000
+    },
+    {
+      "id": 6,
+      "name": "Bryllup",
+      "earmarked": true,
+      "startSaldo": 89428
+    }
+  ],
+  "startSaldoDate": "2026-04-01",
+  "egenkap": "500000",
+  "snittEstimate": "30000",
   "refillJun": true,
   "queueItems": [
     {
@@ -1738,44 +1764,5 @@
         }
       ]
     }
-  },
-  "accounts": [
-    {
-      "id": 1,
-      "name": "BSU P",
-      "earmarked": false,
-      "startSaldo": 147948
-    },
-    {
-      "id": 2,
-      "name": "BSU V",
-      "earmarked": false,
-      "startSaldo": 125605
-    },
-    {
-      "id": 3,
-      "name": "BSU Extra P",
-      "earmarked": false,
-      "startSaldo": 83500
-    },
-    {
-      "id": 4,
-      "name": "BSU Extra V",
-      "earmarked": false,
-      "startSaldo": 139957
-    },
-    {
-      "id": 5,
-      "name": "Emergency Fund",
-      "earmarked": false,
-      "startSaldo": 10000
-    },
-    {
-      "id": 6,
-      "name": "Bryllup",
-      "earmarked": true,
-      "startSaldo": 89428
-    }
-  ],
-  "startSaldoDate": "2026-04-01"
+  }
 }
