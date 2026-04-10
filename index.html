@@ -212,13 +212,20 @@ footer { font-size: 0.65rem; color: var(--text3); text-align: center; margin-top
 .bud-cat-total td { background: transparent; font-weight: 400; font-size: 0.68rem; color: var(--text3); border-top: 0.5px solid var(--surface2); border-bottom: 0.5px solid var(--surface2); }
 .bud-cat-total td:first-child { color: var(--text3); }
 .bud-zero-total td { font-weight: 500; font-size: 0.82rem; background: var(--surface); border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); }
-/* Sticky "Til fordeling" header row */
-.bud-sticky-row th { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--border); font-size: 0.68rem; font-weight: 400; color: var(--text2); padding: 0.35rem 0.4rem; }
+/* Budget header rows — live inside sticky wrapper, no table-sticky needed */
+.bud-header-row { display: flex; align-items: center; font-family: var(--mono); }
+.bud-header-cell { flex-shrink: 0; padding: 0.3rem 0.4rem; text-align: right; font-size: 0.68rem; white-space: nowrap; }
+.bud-header-cell:first-child { text-align: left; min-width: 220px; width: 220px; }
+.bud-header-fordeling { font-weight: 400; color: var(--text2); border-top: 1px solid var(--border); border-bottom: none; }
+.bud-header-months { font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+.bud-header-months .bud-header-cell { font-size: 0.62rem; color: var(--text3); }
+/* Sticky "Til fordeling" row in thead */
+.bud-sticky-row th { position: sticky; top: 130px; z-index: 10; background: #F5F2EB; font-size: 0.68rem; font-weight: 400; color: var(--text2); padding: 0.35rem 0.4rem; border-bottom: none; }
 .bud-sticky-row th:first-child { text-align: left; }
 .bud-sticky-row th.pos { color: var(--green); }
 .bud-sticky-row th.neg { color: var(--red); }
-/* Sticky month label row — sits just below Til fordeling */
-.bud-month-row th { position: sticky; top: 28px; z-index: 9; background: var(--bg); border-bottom: 1px solid var(--border); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); font-weight: 400; padding: 0.35rem 0.4rem; text-align: right; }
+.bud-sticky-row th.zero { color: var(--green); }
+.bud-month-row th { position: sticky; top: 158px; z-index: 9; background: #F5F2EB; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); font-weight: 400; padding: 0.35rem 0.4rem; text-align: right; }
 .bud-month-row th:first-child { text-align: left; }
 .bud-cell-input { background: transparent; border: none; border-bottom: 1px solid transparent; color: var(--text2); font-family: var(--mono); font-size: 0.68rem; text-align: right; width: 70px; padding: 1px 2px; border-radius: 2px; }
 .bud-cell-input:focus { outline: none; border-bottom-color: var(--accent); background: var(--surface2); }
@@ -602,18 +609,19 @@ td:hover .bud-clear-btn { opacity: 1 !important; }
   <!-- TAB 4: BUDSJETT -->
   <div id="tab-budsjett" class="tab-content">
 
-    <!-- Controls bar -->
-    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;">
-      <select id="bud-year" class="form-input" style="width:auto;padding-right:1rem;" onchange="renderBudget()">
-        <option value="2026">2026</option>
-        <option value="2027">2027</option>
-      </select>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;" id="bud-month-filters"></div>
-      <button id="bud-edit-btn" class="bud-edit-btn" onclick="budToggleEdit()">Rediger</button>
+    <!-- Sticky header -->
+    <div id="bud-sticky-wrap" style="position:sticky;top:0;z-index:20;background:#F5F2EB;border-bottom:1px solid var(--border);padding:0.75rem 0 0.5rem;margin-bottom:0.5rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.6rem;">
+        <select id="bud-year" class="form-input" style="width:auto;padding-right:1rem;" onchange="renderBudget()">
+          <option value="2026">2026</option>
+          <option value="2027">2027</option>
+        </select>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;" id="bud-month-filters"></div>
+        <button id="bud-edit-btn" class="bud-edit-btn" onclick="budToggleEdit()" style="margin-left:auto;">Rediger</button>
+      </div>
+      <!-- Zero-budget summary bar -->
+      <div id="bud-zero-bar"></div>
     </div>
-
-    <!-- Zero-budget summary bar -->
-    <div id="bud-zero-bar" style="margin-bottom:1.5rem;"></div>
 
     <!-- Budget table -->
     <div style="overflow-x:visible;">
@@ -625,28 +633,33 @@ td:hover .bud-clear-btn { opacity: 1 !important; }
 
   </div>
 
+  </div>
+
   <!-- TAB 5: MÅNED -->
   <div id="tab-måned" class="tab-content">
 
-    <!-- Controls -->
-    <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;">
-      <select id="mon-year" class="form-input" style="width:auto;" onchange="renderMåned()">
-        <option value="2026">2026</option>
-        <option value="2027">2027</option>
-      </select>
-      <select id="mon-month" class="form-input" style="width:auto;" onchange="renderMåned()">
-        <option value="0">Januar</option><option value="1">Februar</option><option value="2">Mars</option>
-        <option value="3">April</option><option value="4">Mai</option><option value="5">Juni</option>
-        <option value="6">Juli</option><option value="7">August</option><option value="8">September</option>
-        <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
-      </select>
+    <!-- Sticky header -->
+    <div id="mon-sticky-header" style="position:sticky;top:0;z-index:20;background:#F5F2EB;padding:0.75rem 0 0.5rem;margin-bottom:0.5rem;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+        <select id="mon-year" class="form-input" style="width:auto;" onchange="renderMåned()">
+          <option value="2026">2026</option>
+          <option value="2027">2027</option>
+        </select>
+        <select id="mon-month" class="form-input" style="width:auto;" onchange="renderMåned()">
+          <option value="0">Januar</option><option value="1">Februar</option><option value="2">Mars</option>
+          <option value="3">April</option><option value="4">Mai</option><option value="5">Juni</option>
+          <option value="6">Juli</option><option value="7">August</option><option value="8">September</option>
+          <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
+        </select>
+        <button id="mon-edit-btn" onclick="toggleMonEdit()"
+          style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;background:none;border:1px solid var(--border);border-radius:3px;color:var(--text3);padding:2px 8px;cursor:pointer;margin-left:auto;">Rediger</button>
+      </div>
+      <!-- KPI bar -->
+      <div id="mon-kpi"></div>
     </div>
 
-    <!-- KPI bar -->
-    <div id="mon-kpi" style="margin-bottom:1.5rem;"></div>
-
     <!-- Month detail -->
-    <div id="mon-detail"></div>
+    <div id="mon-detail" style="padding-top:0.75rem;"></div>
 
   </div>
 
@@ -1014,7 +1027,12 @@ function getSavingsEstimate() {
 
 function getBudgetSavingsPerMonth(year) {
   const rows = (budgetData[year] && budgetData[year]['sparing']) || [];
-  return MONTH_NAMES.map((_, i) => rows.reduce((s, r) => s + (r.amounts[i] || 0), 0));
+  const freeRows = rows.filter(r => {
+    if (!r.accountId) return true;
+    const acc = accountRegistry.find(a => a.id === r.accountId);
+    return !acc || !acc.earmarked;
+  });
+  return MONTH_NAMES.map((_, i) => freeRows.reduce((s, r) => s + (r.amounts[i] || 0), 0));
 }
 
 function renderSavingsMonths() {
@@ -1072,9 +1090,14 @@ function renderSavingsMonths() {
 // ── SHARED MONTH BUILDER — reads savings from budgetData ──
 function getSavingsForMonth(year, monthIdx) {
   const rows = (budgetData[year] && budgetData[year]['sparing']) || [];
-  const fromBudget = rows.reduce((s, r) => s + (r.amounts[monthIdx] || 0), 0);
+  // Only include rows linked to non-earmarked accounts
+  const freeRows = rows.filter(r => {
+    if (!r.accountId) return true; // unlinked rows included
+    const acc = accountRegistry.find(a => a.id === r.accountId);
+    return !acc || !acc.earmarked;
+  });
+  const fromBudget = freeRows.reduce((s, r) => s + (r.amounts[monthIdx] || 0), 0);
   if (fromBudget > 0) return fromBudget;
-  // Fallback: user estimate
   return getSavingsEstimate();
 }
 
@@ -1988,7 +2011,7 @@ function renderBudget() {
 
   const thead = document.getElementById('bud-thead');
   const tbody = document.getElementById('bud-tbody');
-  if (!thead || !tbody) return;
+  if (!tbody) return;
 
   const visMon = budVisibleMonths;
 
@@ -2004,44 +2027,46 @@ function renderBudget() {
   const tbl = document.getElementById('bud-table');
   if (tbl) tbl.classList.toggle('bud-edit-mode', budEditMode);
 
-  thead.innerHTML = '';
+  if (thead) {
+    thead.innerHTML = '';
 
-  // Sticky "Til fordeling" row
-  const stickyRow = document.createElement('tr');
-  stickyRow.className = 'bud-sticky-row';
-  const thSName = document.createElement('th');
-  thSName.textContent = 'Til fordeling';
-  stickyRow.appendChild(thSName);
-  visMon.forEach(i => {
-    const th = document.createElement('th');
-    const v = _leftMon[i];
-    th.textContent = v !== 0 ? Math.round(v).toLocaleString('nb-NO') : '';
-    th.className = v > 0 ? 'pos' : v < 0 ? 'neg' : '';
-    stickyRow.appendChild(th);
-  });
-  const thSYear = document.createElement('th');
-  thSYear.textContent = Math.round(_leftYear).toLocaleString('nb-NO');
-  thSYear.className = _leftYear >= 0 ? 'pos' : 'neg';
-  stickyRow.appendChild(thSYear);
-  thead.appendChild(stickyRow);
+    // Sticky "Til fordeling" row
+    const stickyRow = document.createElement('tr');
+    stickyRow.className = 'bud-sticky-row';
+    const thSName = document.createElement('th');
+    thSName.textContent = 'Til fordeling';
+    stickyRow.appendChild(thSName);
+    visMon.forEach(i => {
+      const th = document.createElement('th');
+      const v = _leftMon[i];
+      th.textContent = Math.round(v).toLocaleString('nb-NO');
+      th.className = v > 0 ? 'pos' : v < 0 ? 'neg' : 'zero';
+      stickyRow.appendChild(th);
+    });
+    const thSYear = document.createElement('th');
+    thSYear.textContent = Math.round(_leftYear).toLocaleString('nb-NO');
+    thSYear.className = _leftYear > 0 ? 'pos' : _leftYear < 0 ? 'neg' : 'zero';
+    stickyRow.appendChild(thSYear);
+    thead.appendChild(stickyRow);
 
-  // Month labels row
-  const hRow = document.createElement('tr');
-  hRow.className = 'bud-month-row';
-  const thName = document.createElement('th');
-  thName.textContent = '';
-  thName.style.textAlign = 'left';
-  hRow.appendChild(thName);
-  visMon.forEach(i => {
-    const th = document.createElement('th');
-    th.textContent = BUD_MONTHS[i].slice(0,3);
-    hRow.appendChild(th);
-  });
-  const thYear = document.createElement('th');
-  thYear.textContent = 'År';
-  thYear.style.color = 'var(--text2)';
-  hRow.appendChild(thYear);
-  thead.appendChild(hRow);
+    // Month labels row
+    const hRow = document.createElement('tr');
+    hRow.className = 'bud-month-row';
+    const thName = document.createElement('th');
+    thName.textContent = '';
+    thName.style.textAlign = 'left';
+    hRow.appendChild(thName);
+    visMon.forEach(i => {
+      const th = document.createElement('th');
+      th.textContent = BUD_MONTHS[i].slice(0,3);
+      hRow.appendChild(th);
+    });
+    const thYear = document.createElement('th');
+    thYear.textContent = 'År';
+    thYear.style.color = 'var(--text2)';
+    hRow.appendChild(thYear);
+    thead.appendChild(hRow);
+  }
 
   tbody.innerHTML = '';
 
@@ -2190,19 +2215,19 @@ function renderBudget() {
       { label: 'Sinking funds', val: catAnnuals['sinking']||0 },
       { label: 'Gjeld', val: catAnnuals['gjeld']||0 },
     ];
-    zeroBar.innerHTML = `<div class="zero-bar">
-      <div class="zero-card" style="border-color:var(--green);background:var(--green-bg);flex:0 0 auto;min-width:160px;">
-        <div class="zero-card-label" style="color:var(--green);letter-spacing:0.1em;">Sparing ${year}</div>
-        <div class="zero-card-val" style="color:var(--green);font-size:1.15rem;">${Math.round(sparingVal).toLocaleString('nb-NO')} kr</div>
+    zeroBar.innerHTML = `<div class="zero-bar" style="gap:6px;">
+      <div class="zero-card" style="border-color:var(--green);background:var(--green-bg);flex:0 0 auto;padding:0.45rem 0.7rem;">
+        <div class="zero-card-label" style="color:var(--green);">Sparing</div>
+        <div class="zero-card-val" style="color:var(--green);font-size:0.9rem;">${Math.round(sparingVal).toLocaleString('nb-NO')} kr</div>
       </div>
-      <div class="zero-card highlight">
-        <div class="zero-card-label">Til fordeling ${year}</div>
-        <div class="zero-card-val ${annualLeft>=0?'pos':'neg'}">${Math.round(annualLeft).toLocaleString('nb-NO')} kr</div>
+      <div class="zero-card highlight" style="padding:0.45rem 0.7rem;">
+        <div class="zero-card-label">Til fordeling</div>
+        <div class="zero-card-val ${annualLeft > 0 ? 'pos' : annualLeft < 0 ? 'neg' : 'pos'}" style="font-size:0.9rem;">${Math.round(annualLeft).toLocaleString('nb-NO')} kr</div>
       </div>
       ${cards.map(c=>`
-      <div class="zero-card">
-        <div class="zero-card-label">${c.label} ${year}</div>
-        <div class="zero-card-val" style="color:var(--text2);font-size:0.85rem;">${Math.round(c.val).toLocaleString('nb-NO')} kr</div>
+      <div class="zero-card" style="padding:0.45rem 0.7rem;">
+        <div class="zero-card-label">${c.label}</div>
+        <div class="zero-card-val" style="color:var(--text2);font-size:0.82rem;">${Math.round(c.val).toLocaleString('nb-NO')} kr</div>
       </div>`).join('')}
     </div>`;
   }
@@ -2246,16 +2271,45 @@ function renderBudgetIfActive() {
   if (document.getElementById('tab-budsjett').classList.contains('active')) renderBudget();
 }
 
+let monEditMode = false;
+
+function toggleMonEdit() {
+  monEditMode = !monEditMode;
+  const btn = document.getElementById('mon-edit-btn');
+  if (btn) {
+    btn.textContent = monEditMode ? 'Ferdig' : 'Rediger';
+    btn.style.borderColor = monEditMode ? 'var(--green)' : 'var(--border)';
+    btn.style.color = monEditMode ? 'var(--green)' : 'var(--text3)';
+    btn.style.background = monEditMode ? 'var(--green-bg)' : 'none';
+  }
+  renderMåned();
+}
+
+function monAddRow(catId) {
+  const { year } = monGetSel();
+  budEnsureYear(year);
+  budgetData[year][catId].push({ id: Date.now() + Math.random(), name: '', amounts: Array(12).fill(0) });
+  saveState(); renderMåned(); renderBudgetIfActive();
+}
+
+function monRemoveRow(catId, rowId) {
+  const { year } = monGetSel();
+  // Don't allow removing account-linked sparing rows
+  const row = (budgetData[year][catId] || []).find(r => r.id === rowId);
+  if (row && row.accountId) return; // protected
+  budgetData[year][catId] = budgetData[year][catId].filter(r => r.id !== rowId);
+  saveState(); renderMåned(); renderBudgetIfActive();
+}
+
 function renderMåned() {
   const { year, mIdx } = monGetSel();
   budEnsureYear(year);
 
-  // Sync selects to current month by default on first open
   const kpiEl = document.getElementById('mon-kpi');
   const detailEl = document.getElementById('mon-detail');
   if (!kpiEl || !detailEl) return;
 
-  // Calculate KPIs
+  // KPIs
   let totalIn = 0, totalOut = 0, totalSaving = 0;
   BUD_CATS.forEach(cat => {
     const rows = budgetData[year][cat.id] || [];
@@ -2285,7 +2339,6 @@ function renderMåned() {
     </div>
   </div>`;
 
-  // Detail sections
   detailEl.innerHTML = '';
   BUD_CATS.forEach(cat => {
     const rows = budgetData[year][cat.id] || [];
@@ -2306,50 +2359,89 @@ function renderMåned() {
       const meta = (row.meta && row.meta[mIdx]) || { confirmed: false, comment: '' };
       const isConfirmed = meta.confirmed;
       const hasComment = !!(meta.comment && meta.comment.trim());
+      const isLinked = !!row.accountId; // linked to account registry, name locked
 
       const div = document.createElement('div');
       div.className = 'mon-row' + (isConfirmed ? ' confirmed' : '');
 
-      // Top line: checkbox + name + comment-btn + amount
       const top = document.createElement('div');
       top.className = 'mon-row-top';
 
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.className = 'mon-check';
-      cb.checked = isConfirmed;
-      cb.addEventListener('change', () => monSetConfirmed(year, cat.id, row.id, mIdx, cb.checked));
-      top.appendChild(cb);
+      // Checkbox (hidden in edit mode)
+      if (!monEditMode) {
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'mon-check';
+        cb.checked = isConfirmed;
+        cb.addEventListener('change', () => monSetConfirmed(year, cat.id, row.id, mIdx, cb.checked));
+        top.appendChild(cb);
+      }
 
-      const name = document.createElement('span');
-      name.className = 'mon-row-name';
-      name.textContent = row.name || '—';
-      top.appendChild(name);
+      // Name — editable in edit mode (unless linked)
+      if (monEditMode && !isLinked) {
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.className = 'bud-name-input';
+        nameInput.value = row.name || '';
+        nameInput.placeholder = 'Navn...';
+        nameInput.style.flex = '1';
+        nameInput.addEventListener('change', () => {
+          row.name = nameInput.value;
+          saveState(); renderBudgetIfActive();
+        });
+        top.appendChild(nameInput);
+      } else {
+        const name = document.createElement('span');
+        name.className = 'mon-row-name';
+        name.textContent = row.name || '—';
+        if (isLinked) name.style.fontWeight = '500';
+        top.appendChild(name);
+      }
 
-      // Comment toggle button
-      const commentWrap = document.createElement('div');
-      commentWrap.className = 'mon-comment-wrap' + (hasComment ? ' open' : '');
-      const commentInput = document.createElement('input');
-      commentInput.type = 'text';
-      commentInput.placeholder = 'skriv notat...';
-      commentInput.value = meta.comment || '';
-      commentInput.addEventListener('change', () => {
-        monSetComment(year, cat.id, row.id, mIdx, commentInput.value);
-        const nowHas = !!commentInput.value.trim();
-        commentBtn.classList.toggle('has-comment', nowHas);
-      });
-      commentWrap.appendChild(commentInput);
+      // Comment btn (view mode only)
+      if (!monEditMode) {
+        const commentWrap = document.createElement('div');
+        commentWrap.className = 'mon-comment-wrap' + (hasComment ? ' open' : '');
+        const commentInput = document.createElement('input');
+        commentInput.type = 'text';
+        commentInput.placeholder = 'skriv notat...';
+        commentInput.value = meta.comment || '';
+        commentInput.addEventListener('change', () => {
+          monSetComment(year, cat.id, row.id, mIdx, commentInput.value);
+          commentBtn.classList.toggle('has-comment', !!commentInput.value.trim());
+        });
+        commentWrap.appendChild(commentInput);
 
-      const commentBtn = document.createElement('button');
-      commentBtn.className = 'mon-comment-btn' + (hasComment ? ' has-comment' : '');
-      commentBtn.title = hasComment ? meta.comment : 'Legg til notat';
-      commentBtn.textContent = '✎';
-      commentBtn.addEventListener('click', () => {
-        const isOpen = commentWrap.classList.toggle('open');
-        if (isOpen) setTimeout(() => commentInput.focus(), 50);
-      });
-      top.appendChild(commentBtn);
+        const commentBtn = document.createElement('button');
+        commentBtn.className = 'mon-comment-btn' + (hasComment ? ' has-comment' : '');
+        commentBtn.title = hasComment ? meta.comment : 'Legg til notat';
+        commentBtn.textContent = '✎';
+        commentBtn.addEventListener('click', () => {
+          const isOpen = commentWrap.classList.toggle('open');
+          if (isOpen) setTimeout(() => commentInput.focus(), 50);
+        });
+        top.appendChild(commentBtn);
+        div.appendChild(top);
+        div.appendChild(commentWrap);
+      } else {
+        // Delete btn in edit mode (not for linked rows)
+        if (!isLinked) {
+          const delBtn = document.createElement('button');
+          delBtn.style.cssText = 'background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.9rem;padding:0 2px 0 6px;flex-shrink:0;margin-left:auto;';
+          delBtn.textContent = '×';
+          delBtn.addEventListener('click', () => monRemoveRow(cat.id, row.id));
+          top.appendChild(delBtn);
+        } else {
+          // Linked — show lock hint
+          const lock = document.createElement('span');
+          lock.style.cssText = 'font-size:0.62rem;color:var(--text3);margin-left:auto;padding-left:6px;white-space:nowrap;';
+          lock.textContent = '⇄ konto';
+          top.appendChild(lock);
+        }
+        div.appendChild(top);
+      }
 
+      // Amount input
       const amtWrap = document.createElement('div');
       amtWrap.className = 'mon-row-amount';
       const amtInput = document.createElement('input');
@@ -2365,12 +2457,19 @@ function renderMåned() {
       amtWrap.appendChild(amtInput);
       top.appendChild(amtWrap);
 
-      div.appendChild(top);
-      div.appendChild(commentWrap);
       section.appendChild(div);
     });
 
-    // Category total
+    // Add row button in edit mode
+    if (monEditMode) {
+      const addBtn = document.createElement('button');
+      addBtn.className = 'bud-add-btn';
+      addBtn.style.marginTop = '6px';
+      addBtn.textContent = '+ Legg til rad';
+      addBtn.addEventListener('click', () => monAddRow(cat.id));
+      section.appendChild(addBtn);
+    }
+
     const total = document.createElement('div');
     total.className = 'mon-cat-total';
     total.innerHTML = `<span>Sum ${cat.label.toLowerCase()}</span><span>${catSum > 0 ? Math.round(catSum).toLocaleString('nb-NO') + '\u00a0kr' : '—'}</span>`;
