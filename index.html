@@ -897,6 +897,7 @@ function calcBolig() {
     gevEl.textContent = signed(gevinst);
     gevEl.className = 'tl-row-val ' + (gevinst >= 0 ? 'pos' : 'neg');
   }
+  saveState();
 }
 
 // ── IDÉER ──
@@ -2729,12 +2730,22 @@ function getState() {
   const egEl = document.getElementById('egenkap');
   const snEl = document.getElementById('snitt-estimate');
   const refill = document.getElementById('refillJun');
+  const boligFields = ['bl-pris','bl-ek','bl-vekst','bl-selger',
+    'bl-bank-lan','bl-bank-mnd','bl-bank-rente',
+    'bl-felles-total','bl-felles-gjeld','bl-felles-rente',
+    'bl-strom','bl-forsikring','bl-vedlikehold','bl-inntekt'];
+  const bolig = {};
+  boligFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) bolig[id] = el.value;
+  });
   return {
     accountRegistry,
     startSaldoDate,
     egenkap: egEl ? String(parseRaw(egEl.value) || 0) : '0',
     snittEstimate: snEl ? String(parseRaw(snEl.value) || 0) : '0',
     refillJun: refill ? refill.checked : true,
+    bolig,
     queueItems,
     ideas,
     budgetData,
@@ -2771,7 +2782,13 @@ function applyState(state) {
 
   if (state.startSaldoDate) startSaldoDate = state.startSaldoDate;
 
-  // egenkap
+  // Bolig
+  if (state.bolig && typeof state.bolig === 'object') {
+    Object.entries(state.bolig).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    });
+  }
   const applyInput = (id, val) => {
     const el = document.getElementById(id);
     if (el && val !== undefined) {
