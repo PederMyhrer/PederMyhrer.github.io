@@ -1613,7 +1613,19 @@ function parsePlannedMonth(pm) {
 }
 
 function simulateMonths() {
-  const { months } = buildMonths();
+  const { months: rawMonths, freeToday, apr: aprSavings } = buildMonths();
+
+  // Prepend April as a simulation month — capital is accountsFree() + april savings,
+  // no purchase deduction (that happens in May)
+  const aprilFree = freeToday + aprSavings;
+  const aprilMonth = {
+    name: 'April', year: 2026,
+    free: aprilFree, prevFree: freeToday,
+    savings: aprSavings, refillAmt: 0,
+    loanFromBryllup: 0, special: null,
+    brylSaldo: 0,
+  };
+  const months = [aprilMonth, ...rawMonths];
   const buffers = queueItems.filter(i=>i.type==='buffer');
   const wishes  = queueItems.filter(i=>i.type==='wish');
 
