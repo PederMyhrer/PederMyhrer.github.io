@@ -47,6 +47,22 @@
   "egenkap": "500000",
   "snittEstimate": "30000",
   "refillJun": true,
+  "bolig": {
+    "bl-pris": "4 483 450",
+    "bl-ek": "500 000",
+    "bl-vekst": "4,00",
+    "bl-selger": "5",
+    "bl-bank-lan": "1 080 000",
+    "bl-bank-mnd": "5 800",
+    "bl-bank-rente": "5,00",
+    "bl-felles-total": "15 197",
+    "bl-felles-gjeld": "6 640",
+    "bl-felles-rente": "5,00",
+    "bl-strom": "500",
+    "bl-forsikring": "200",
+    "bl-vedlikehold": "0",
+    "bl-inntekt": "64 500"
+  },
   "queueItems": [
     {
       "id": 1775587275839,
@@ -56,10 +72,10 @@
       "plannedMonth": ""
     },
     {
-      "id": 1775587373673,
-      "type": "buffer",
-      "name": "Buffer",
-      "amount": 25000,
+      "id": 1776009309401,
+      "type": "wish",
+      "name": "Teppe",
+      "amount": 3500,
       "plannedMonth": ""
     },
     {
@@ -70,17 +86,24 @@
       "plannedMonth": ""
     },
     {
+      "id": 1776009344692,
+      "type": "wish",
+      "name": "Spisestoler",
+      "amount": 9000,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775587373673,
+      "type": "buffer",
+      "name": "Buffer",
+      "amount": 25000,
+      "plannedMonth": ""
+    },
+    {
       "id": 1775643161696,
       "type": "wish",
       "name": "Skapsystem for boden",
       "amount": 1200,
-      "plannedMonth": ""
-    },
-    {
-      "id": 1775587411748,
-      "type": "wish",
-      "name": "Spisestoler",
-      "amount": 6000,
       "plannedMonth": ""
     },
     {
