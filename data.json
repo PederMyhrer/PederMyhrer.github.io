@@ -16,25 +16,25 @@
       "id": 3,
       "name": "BSU Extra P",
       "earmarked": false,
-      "startSaldo": 83500
+      "startSaldo": 78845
     },
     {
       "id": 4,
       "name": "BSU Extra V",
       "earmarked": false,
-      "startSaldo": 139957
+      "startSaldo": 143338
     },
     {
       "id": 5,
       "name": "Emergency Fund",
       "earmarked": false,
-      "startSaldo": 4858
+      "startSaldo": 0
     },
     {
       "id": 6,
       "name": "Bryllup",
       "earmarked": true,
-      "startSaldo": 89428
+      "startSaldo": 88207
     },
     {
       "id": 1775806770142,
@@ -1078,7 +1078,7 @@
             20072,
             16461,
             10508,
-            0,
+            3800,
             41078,
             68236,
             39946,
@@ -1116,7 +1116,7 @@
           "accountId": 4,
           "meta": {
             "3": {
-              "confirmed": false,
+              "confirmed": true,
               "comment": "Sett inn 2304 senere"
             }
           }
@@ -1167,7 +1167,7 @@
             0,
             0,
             0,
-            0,
+            19224,
             0,
             0,
             0,
