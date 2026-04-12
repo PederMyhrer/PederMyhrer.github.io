@@ -1870,11 +1870,6 @@ function renderQueueTimeline() {
     byYear[m.year].push(m);
   });
 
-  // Build April summary from buildMonths() for the first year
-  const { months: bm, loanFromBryllup: bmloan, atPayment: bmat, egenkap: bmek, apr: aprSavings } = buildMonths();
-  const freeToday = accountsFree();
-  const freeAfterApril = Math.max(0, bmat - bmek);
-
   Object.entries(byYear).forEach(([year, yMonths]) => {
     let anyUnlockedInYear = false;
 
@@ -1942,10 +1937,10 @@ function renderQueueTimeline() {
         </div>
         <div class="tl-month-body" style="padding:0.5rem 0.75rem;">
           ${m.name==='Mai'&&m.year===2026 ? `
-          <div class="tl-row"><span class="tl-row-label">Fra april</span><span class="tl-row-val neut">${nbFmt(bmat)}</span></div>
+          <div class="tl-row"><span class="tl-row-label">Fra april</span><span class="tl-row-val neut">${nbFmt(m.prevCashFritt !== null ? m.prevCashFritt : m.prevFree)}</span></div>
           <div class="tl-row"><span class="tl-row-label">Sparing inn</span><span class="tl-row-val pos">${signed(m.savings)}</span></div>
           ${m.loanFromBryllup>0?`<div class="tl-row"><span class="tl-row-label">L\u00e5n fra bryllupskonto</span><span class="tl-row-val neg">${signed(-m.loanFromBryllup)}</span></div>`:''}
-          <div class="tl-row"><span class="tl-row-label">Egenkapital til megler</span><span class="tl-row-val neg">${signed(-bmek)}</span></div>
+          <div class="tl-row"><span class="tl-row-label">Egenkapital til megler</span><span class="tl-row-val neg">${signed(-parseVal('egenkap'))}</span></div>
           ` : `
           <div class="tl-row"><span class="tl-row-label">Fra forrige m\u00e5ned</span><span class="tl-row-val neut">${nbFmt(m.prevCashFritt !== null ? m.prevCashFritt : m.prevFree)}</span></div>
           <div class="tl-row"><span class="tl-row-label">Sparing inn</span><span class="tl-row-val pos">${signed(m.savings)}</span></div>
@@ -1968,23 +1963,6 @@ function renderQueueTimeline() {
     yrDiv.className = 'tl-month' + (anyUnlockedInYear || parseInt(year)===2026 ? ' open' : '');
     yrDiv.style.marginBottom = '0.6rem';
 
-    // Static April card for 2026 — shows sparing before purchase in May
-    const aprilCard = parseInt(year) === 2026 ? `
-      <div class="tl-month" style="margin:0 0 4px 0;border-radius:3px;">
-        <div class="tl-month-header" style="padding:0.5rem 0.75rem;">
-          <span class="tl-month-name" style="font-size:0.75rem;">April</span>
-          <div class="tl-month-right">
-            <span class="tl-month-total pos" style="font-size:0.8rem;">${nbFmt(bmat)}</span>
-            <span class="chevron">▼</span>
-          </div>
-        </div>
-        <div class="tl-month-body" style="padding:0.5rem 0.75rem;">
-          <div class="tl-row"><span class="tl-row-label">Fritt på kontoer</span><span class="tl-row-val neut">${nbFmt(freeToday)}</span></div>
-          <div class="tl-row"><span class="tl-row-label">Sparing inn</span><span class="tl-row-val pos">${signed(aprSavings)}</span></div>
-          <div class="tl-total"><span>Tilgjengelig til kjøp i mai</span><span class="pos">${nbFmt(bmat)}</span></div>
-        </div>
-      </div>` : '';
-
     yrDiv.innerHTML = `
       <div class="tl-month-header">
         <span class="tl-month-name">${year}</span>
@@ -1993,7 +1971,7 @@ function renderQueueTimeline() {
           <span class="chevron">\u25bc</span>
         </div>
       </div>
-      <div class="tl-month-body" style="padding:0.5rem 0.75rem;">${aprilCard}${monthDivs}</div>`;
+      <div class="tl-month-body" style="padding:0.5rem 0.75rem;">${monthDivs}</div>`;
 
     const yrChev = yrDiv.querySelector(':scope > .tl-month-header .chevron');
     yrDiv.querySelector('.tl-month-header').addEventListener('click', () => {
