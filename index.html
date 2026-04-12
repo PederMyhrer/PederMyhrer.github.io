@@ -458,6 +458,7 @@ td:hover .bud-clear-btn { opacity: 1 !important; }
             <label class="form-label">Planlagt måned <span style="color:var(--text3);font-weight:400;">(valgfritt)</span></label>
             <select class="form-input" id="q-month" style="width:100%;padding-right:0.6rem;">
               <option value="">— Ingen, første mulig —</option>
+              <option value="April-2026">April 2026</option>
               <option value="Mai-2026">Mai 2026</option>
               <option value="Juni-2026">Juni 2026</option>
               <option value="Juli-2026">Juli 2026</option>
@@ -1329,12 +1330,14 @@ function buildMonths() {
   let brylSaldo = brylAfterKjop;
   const months = [];
 
-  // Build month list: Mai 2026 (index 4) through Des 2028
+  // Build month list: April 2026 (index 3) through Des 2028
   const schedule = [];
+  // April 2026 — sparing comes in but kjøp happens, no auto-allocate to wishlist
+  schedule.push({ name: MONTH_NAMES[3], year: 2026, monthIdx: 3, noAutoAllocate: true, special: null });
   // 2026: mai(4)–des(11)
   for (let i = 4; i <= 11; i++) {
     schedule.push({ name: MONTH_NAMES[i], year: 2026, monthIdx: i,
-      refill: i === 5, // juni
+      refill: i === 5,
       special: i === 4 ? 'kjøpsmåned' : null });
   }
   // 2027 and 2028
@@ -1357,6 +1360,7 @@ function buildMonths() {
       name: m.name, year: m.year, free, brylSaldo,
       savings, refillAmt, prevFree,
       special: m.special || null,
+      noAutoAllocate: m.noAutoAllocate || false,
       loanFromBryllup: idx === 0 ? loanFromBryllup : 0,
     });
   });
@@ -1674,6 +1678,8 @@ function simulateMonths() {
           continue;
         }
       } else {
+        // Skip auto-allocation for noAutoAllocate months (e.g. april)
+        if (m.noAutoAllocate) continue;
         if (simWish >= w.amount) {
           unlockedWish.add(w.id);
           simWish -= w.amount;
@@ -1699,6 +1705,7 @@ function simulateMonths() {
     return {
       label, shortLabel,
       year: m.year, name: m.name,
+      noAutoAllocate: m.noAutoAllocate || false,
       trueAvailable,
       total: totalInklBuf,
       cashFritt,
@@ -1927,7 +1934,7 @@ function renderQueueTimeline() {
         </div>
         <div class="tl-month-body" style="padding:0.5rem 0.75rem;">
           ${m.name==='Mai'&&m.year===2026 ? `
-          <div class="tl-row"><span class="tl-row-label">Tilgjengelig fra april</span><span class="tl-row-val neut">${nbFmt(bmat)}</span></div>
+          <div class="tl-row"><span class="tl-row-label">Fra april</span><span class="tl-row-val neut">${nbFmt(m.prevCashFritt !== null ? m.prevCashFritt : m.prevFree)}</span></div>
           <div class="tl-row"><span class="tl-row-label">Sparing inn</span><span class="tl-row-val pos">${signed(m.savings)}</span></div>
           ${m.loanFromBryllup>0?`<div class="tl-row"><span class="tl-row-label">L\u00e5n fra bryllupskonto</span><span class="tl-row-val neg">${signed(-m.loanFromBryllup)}</span></div>`:''}
           <div class="tl-row"><span class="tl-row-label">Egenkapital til megler</span><span class="tl-row-val neg">${signed(-bmek)}</span></div>
@@ -1953,22 +1960,6 @@ function renderQueueTimeline() {
     yrDiv.className = 'tl-month' + (anyUnlockedInYear || parseInt(year)===2026 ? ' open' : '');
     yrDiv.style.marginBottom = '0.6rem';
 
-    // April card only for 2026 — ren sparemåned, kjøpet skjer i Mai
-    const aprilCard = parseInt(year) === 2026 ? `
-      <div class="tl-month" style="margin:0 0 4px 0;border-radius:3px;">
-        <div class="tl-month-header" style="padding:0.5rem 0.75rem;">
-          <span class="tl-month-name" style="font-size:0.75rem;">April</span>
-          <div class="tl-month-right">
-            <span class="tl-month-total pos" style="font-size:0.8rem;">${nbFmt(bmat)}</span>
-            <span class="chevron">▼</span>
-          </div>
-        </div>
-        <div class="tl-month-body" style="padding:0.5rem 0.75rem;">
-          <div class="tl-row"><span class="tl-row-label">Fritt på kontoer i dag</span><span class="tl-row-val neut">${nbFmt(freeToday)}</span></div>
-          <div class="tl-row"><span class="tl-row-label">Sparing inn i april</span><span class="tl-row-val pos">${signed(aprSavings)}</span></div>
-          <div class="tl-total"><span>Tilgjengelig til kjøp i mai</span><span class="pos">${nbFmt(bmat)}</span></div>
-        </div>
-      </div>` : '';
     yrDiv.innerHTML = `
       <div class="tl-month-header">
         <span class="tl-month-name">${year}</span>
@@ -1977,7 +1968,7 @@ function renderQueueTimeline() {
           <span class="chevron">\u25bc</span>
         </div>
       </div>
-      <div class="tl-month-body" style="padding:0.5rem 0.75rem;">${aprilCard}${monthDivs}</div>`;
+      <div class="tl-month-body" style="padding:0.5rem 0.75rem;">${monthDivs}</div>`;
 
     const yrChev = yrDiv.querySelector(':scope > .tl-month-header .chevron');
     yrDiv.querySelector('.tl-month-header').addEventListener('click', () => {
@@ -2815,6 +2806,17 @@ function applyState(state) {
     });
     // Ensure sparing rows exist for all registered accounts
     Object.keys(budgetData).forEach(year => ensureSparingRowsForAccounts(parseInt(year)));
+
+    // Fix orphan sparing rows — sync accountId by name match against registry
+    Object.keys(budgetData).forEach(year => {
+      const rows = budgetData[year]['sparing'] || [];
+      rows.forEach(row => {
+        if (!row.accountId) {
+          const match = accountRegistry.find(a => a.name === row.name);
+          if (match) row.accountId = match.id;
+        }
+      });
+    });
   }
 }
 
