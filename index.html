@@ -1625,6 +1625,7 @@ function simulateMonths() {
     savings: aprSavings, refillAmt: 0,
     loanFromBryllup: 0, special: null,
     brylSaldo: 0,
+    noAutoAllocate: true,
   };
   const months = [aprilMonth, ...rawMonths];
   const buffers = queueItems.filter(i=>i.type==='buffer');
@@ -1689,6 +1690,7 @@ function simulateMonths() {
           continue;
         }
       } else {
+        if (m.noAutoAllocate) continue; // april: only planned items allowed
         if (simWish >= w.amount) {
           unlockedWish.add(w.id);
           simWish -= w.amount;
@@ -1714,6 +1716,7 @@ function simulateMonths() {
     return {
       label, shortLabel,
       year: m.year, name: m.name,
+      noAutoAllocate: m.noAutoAllocate || false,
       trueAvailable,
       total: totalInklBuf,
       cashFritt,
