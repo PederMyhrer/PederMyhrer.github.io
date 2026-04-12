@@ -1543,9 +1543,22 @@ function toggleQueueEdit(id) {
   const panel = document.getElementById('qi-edit-' + id);
   if (!panel) return;
   const isOpen = panel.style.display === 'flex';
-  // Close all others
   document.querySelectorAll('.qi-edit-panel').forEach(p => p.style.display = 'none');
   panel.style.display = isOpen ? 'none' : 'flex';
+}
+
+function queueMonthOptions(selected) {
+  const months = ['April','Mai','Juni','Juli','August','September','Oktober','November','Desember'];
+  const opts = ['<option value="">— Ingen, første mulig —</option>'];
+  [2026,2027,2028].forEach(yr => {
+    const start = yr === 2026 ? 0 : 0;
+    const list  = yr === 2026 ? months : ['Januar','Februar','Mars','April','Mai','Juni','Juli','August','September','Oktober','November','Desember'];
+    list.forEach(mn => {
+      const val = mn + '-' + yr;
+      opts.push(`<option value="${val}"${selected===val?' selected':''}>${mn} ${yr}</option>`);
+    });
+  });
+  return opts.join('');
 }
 
 function removeItem(id) {
@@ -1588,6 +1601,10 @@ function renderQueue() {
           <input type="text" value="${Math.round(item.amount).toLocaleString('nb-NO')}" placeholder="Beløp"
             style="font-family:var(--mono);font-size:0.72rem;background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:2px 6px;width:80px;text-align:right;"
             onchange="const n=parseRaw(this.value);if(!isNaN(n)&&n>0){queueItems.find(i=>i.id===${item.id}).amount=n;saveState();renderQueue();renderQueueTimeline();}">
+          <select style="font-family:var(--mono);font-size:0.68rem;background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text2);"
+            onchange="queueItems.find(i=>i.id===${item.id}).plannedMonth=this.value;saveState();renderQueue();renderQueueTimeline();">
+            ${queueMonthOptions(item.plannedMonth||'')}
+          </select>
           <button onclick="queueItems.find(i=>i.id===${item.id}).type=queueItems.find(i=>i.id===${item.id}).type==='wish'?'buffer':'wish';saveState();renderQueue();renderQueueTimeline();"
             style="font-family:var(--mono);font-size:0.65rem;padding:2px 7px;border-radius:2px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);">
             → ${item.type==='wish'?'Buffer':'Ønske'}
