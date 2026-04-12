@@ -28,7 +28,7 @@
       "id": 5,
       "name": "Emergency Fund",
       "earmarked": false,
-      "startSaldo": 10000
+      "startSaldo": 4858
     },
     {
       "id": 6,
@@ -64,20 +64,6 @@
     "bl-inntekt": "64 500"
   },
   "queueItems": [
-    {
-      "id": 1775587275839,
-      "type": "wish",
-      "name": "Spisebord",
-      "amount": 5000,
-      "plannedMonth": ""
-    },
-    {
-      "id": 1776009309401,
-      "type": "wish",
-      "name": "Teppe",
-      "amount": 3500,
-      "plannedMonth": ""
-    },
     {
       "id": 1775643175863,
       "type": "wish",
@@ -649,7 +635,13 @@
             0,
             0,
             0
-          ]
+          ],
+          "meta": {
+            "3": {
+              "confirmed": true,
+              "comment": ""
+            }
+          }
         },
         {
           "id": 13,
@@ -763,7 +755,13 @@
             0,
             0,
             0
-          ]
+          ],
+          "meta": {
+            "3": {
+              "confirmed": true,
+              "comment": ""
+            }
+          }
         }
       ],
       "sinking": [
@@ -1105,7 +1103,7 @@
             13929,
             13107,
             10508,
-            0,
+            3356,
             0,
             0,
             0,
@@ -1115,7 +1113,13 @@
             0,
             0
           ],
-          "accountId": 4
+          "accountId": 4,
+          "meta": {
+            "3": {
+              "confirmed": false,
+              "comment": "Sett inn 2304 senere"
+            }
+          }
         },
         {
           "id": 5,
@@ -1163,7 +1167,7 @@
             0,
             0,
             0,
-            19599,
+            0,
             0,
             0,
             0,
@@ -1172,7 +1176,13 @@
             0,
             0,
             0
-          ]
+          ],
+          "meta": {
+            "3": {
+              "confirmed": false,
+              "comment": ""
+            }
+          }
         }
       ]
     },
