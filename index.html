@@ -1613,14 +1613,15 @@ function parsePlannedMonth(pm) {
 }
 
 function simulateMonths() {
-  const { months: rawMonths, freeToday, apr: aprSavings } = buildMonths();
+  const { months: rawMonths, apr: aprSavings, egenkap, loanFromBryllup } = buildMonths();
 
-  // Prepend April as a simulation month — capital is accountsFree() + april savings,
-  // no purchase deduction (that happens in May)
-  const aprilFree = freeToday + aprSavings;
+  // April: starts from current free account balances + april savings
+  // No purchase deduction — that happens in May
+  const aprilStart = accountsFree();
+  const aprilFree  = aprilStart + aprSavings;
   const aprilMonth = {
     name: 'April', year: 2026,
-    free: aprilFree, prevFree: freeToday,
+    free: aprilFree, prevFree: aprilStart,
     savings: aprSavings, refillAmt: 0,
     loanFromBryllup: 0, special: null,
     brylSaldo: 0,
