@@ -1642,6 +1642,7 @@ function simulateMonths() {
     let simBuf = m.free;
     let allocBuf = 0;
     bufFilled = bufFilled.map(b => {
+      if (m.noAutoAllocate) return b; // april: no auto-filling
       const pm = parsePlannedMonth(b.plannedMonth);
       if (pm) {
         const monthIdx = months.findIndex(x => x.name === m.name && x.year === m.year);
