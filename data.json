@@ -65,13 +65,6 @@
   },
   "queueItems": [
     {
-      "id": 1775643175863,
-      "type": "wish",
-      "name": "Garderobe sov",
-      "amount": 12000,
-      "plannedMonth": ""
-    },
-    {
       "id": 1776009344692,
       "type": "wish",
       "name": "Spisestoler",
@@ -79,17 +72,31 @@
       "plannedMonth": ""
     },
     {
-      "id": 1775587373673,
-      "type": "buffer",
-      "name": "Buffer",
-      "amount": 25000,
+      "id": 1775643175863,
+      "type": "wish",
+      "name": "Garderobe sov",
+      "amount": 10740,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775588274996,
+      "type": "wish",
+      "name": "Utemøbler",
+      "amount": 5000,
       "plannedMonth": ""
     },
     {
       "id": 1775643161696,
       "type": "wish",
       "name": "Skapsystem for boden",
-      "amount": 1200,
+      "amount": 1000,
+      "plannedMonth": ""
+    },
+    {
+      "id": 1775587373673,
+      "type": "buffer",
+      "name": "Buffer",
+      "amount": 25000,
       "plannedMonth": ""
     },
     {
@@ -111,13 +118,6 @@
       "type": "wish",
       "name": "Weber Grill",
       "amount": 3790,
-      "plannedMonth": ""
-    },
-    {
-      "id": 1775588274996,
-      "type": "wish",
-      "name": "Utemøbler",
-      "amount": 5000,
       "plannedMonth": ""
     }
   ],
