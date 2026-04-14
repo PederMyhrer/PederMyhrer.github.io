@@ -24,5 +24,13 @@ Hold kontroll, spar smartere, og ta bedre økonomiske valg 💡
     - Eller år-basert modell med mer nøyaktig nedbetaling  
 
 ### Visualisering av reell boligkostnad
-- Legge til rentefradrag som en egen post  
-- Vise "ekte" boligkostnad etter fradrag  
+- Legge til rentefradrag som en egen post
+- Må beregnes riktig med året man ser på, nedbetaling etc 
+- Vise "ekte" boligkostnad etter fradrag
+
+### Legge til busjett for bryllup
+- Erstatte google sheets oversikten
+
+### Kryptering av data
+- Krypteringslag til data.json
+- Fjerne alle data som ligger i html, flytt til json
