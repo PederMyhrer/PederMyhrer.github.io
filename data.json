@@ -16,13 +16,13 @@
       "id": 3,
       "name": "BSU Extra P",
       "earmarked": false,
-      "startSaldo": 78845
+      "startSaldo": 78666
     },
     {
       "id": 4,
       "name": "BSU Extra V",
       "earmarked": false,
-      "startSaldo": 143338
+      "startSaldo": 147837
     },
     {
       "id": 5,
@@ -34,7 +34,7 @@
       "id": 6,
       "name": "Bryllup",
       "earmarked": true,
-      "startSaldo": 88207
+      "startSaldo": 79476
     },
     {
       "id": 1775806770142,
@@ -65,34 +65,6 @@
   },
   "queueItems": [
     {
-      "id": 1776009344692,
-      "type": "wish",
-      "name": "Spisestoler",
-      "amount": 9000,
-      "plannedMonth": ""
-    },
-    {
-      "id": 1775643175863,
-      "type": "wish",
-      "name": "Garderobe sov",
-      "amount": 10740,
-      "plannedMonth": ""
-    },
-    {
-      "id": 1775588274996,
-      "type": "wish",
-      "name": "Utemøbler",
-      "amount": 5000,
-      "plannedMonth": ""
-    },
-    {
-      "id": 1775643161696,
-      "type": "wish",
-      "name": "Skapsystem for boden",
-      "amount": 1000,
-      "plannedMonth": ""
-    },
-    {
       "id": 1775587373673,
       "type": "buffer",
       "name": "Buffer",
@@ -119,6 +91,27 @@
       "name": "Weber Grill",
       "amount": 3790,
       "plannedMonth": ""
+    },
+    {
+      "id": 1776239973448,
+      "type": "buffer",
+      "name": "Buffer II",
+      "amount": 25000,
+      "plannedMonth": "Juli-2026"
+    },
+    {
+      "id": 1776239997510,
+      "type": "buffer",
+      "name": "Barnebuffer",
+      "amount": 25000,
+      "plannedMonth": "Januar-2027"
+    },
+    {
+      "id": 1776240016244,
+      "type": "wish",
+      "name": "Bil",
+      "amount": 200000,
+      "plannedMonth": "April-2027"
     }
   ],
   "ideas": [],
@@ -132,7 +125,7 @@
             14074,
             14314,
             15272,
-            15272,
+            15203,
             15272,
             37907,
             50838,
@@ -141,7 +134,13 @@
             39190,
             39190,
             39190
-          ]
+          ],
+          "meta": {
+            "3": {
+              "confirmed": true,
+              "comment": ""
+            }
+          }
         },
         {
           "id": 2,
@@ -219,7 +218,13 @@
             0,
             0,
             0
-          ]
+          ],
+          "meta": {
+            "3": {
+              "confirmed": true,
+              "comment": ""
+            }
+          }
         },
         {
           "id": 6,
@@ -237,7 +242,13 @@
             11376,
             11376,
             11376
-          ]
+          ],
+          "meta": {
+            "3": {
+              "confirmed": true,
+              "comment": ""
+            }
+          }
         },
         {
           "id": 8,
@@ -377,7 +388,13 @@
             5800,
             5800,
             5800
-          ]
+          ],
+          "meta": {
+            "3": {
+              "confirmed": true,
+              "comment": ""
+            }
+          }
         },
         {
           "id": 2,
@@ -916,7 +933,7 @@
             0,
             0,
             0,
-            3500,
+            30312,
             0,
             0,
             0,
@@ -1078,7 +1095,7 @@
             20072,
             16461,
             10508,
-            3800,
+            1,
             41078,
             68236,
             39946,
@@ -1103,7 +1120,7 @@
             13929,
             13107,
             10508,
-            3356,
+            0,
             0,
             0,
             0,
@@ -1116,8 +1133,8 @@
           "accountId": 4,
           "meta": {
             "3": {
-              "confirmed": true,
-              "comment": "Sett inn 2304 senere"
+              "confirmed": false,
+              "comment": ""
             }
           }
         },
@@ -1157,7 +1174,13 @@
             0,
             0,
             0
-          ]
+          ],
+          "meta": {
+            "3": {
+              "confirmed": true,
+              "comment": ""
+            }
+          }
         },
         {
           "id": 1775806770142.976,
@@ -1167,7 +1190,7 @@
             0,
             0,
             0,
-            19224,
+            0,
             0,
             0,
             0,
