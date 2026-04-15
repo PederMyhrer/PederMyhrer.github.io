@@ -95,8 +95,8 @@
     {
       "id": 1776239973448,
       "type": "buffer",
-      "name": "Buffer II",
-      "amount": 25000,
+      "name": "Kostnadsbuffer",
+      "amount": 100000,
       "plannedMonth": "Juli-2026"
     },
     {
@@ -112,6 +112,13 @@
       "name": "Bil",
       "amount": 200000,
       "plannedMonth": "April-2027"
+    },
+    {
+      "id": 1776240427712,
+      "type": "buffer",
+      "name": "Helsebuffer",
+      "amount": 25000,
+      "plannedMonth": "November-2026"
     }
   ],
   "ideas": [],
@@ -958,7 +965,7 @@
             3880,
             2000,
             2000,
-            3500,
+            5000,
             2500,
             0,
             0,
@@ -1047,6 +1054,24 @@
               "comment": ""
             }
           }
+        },
+        {
+          "id": 1776240699867,
+          "name": "Lån av oss selv",
+          "amounts": [
+            0,
+            0,
+            0,
+            0,
+            4431,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
         }
       ],
       "sparing": [
@@ -1096,7 +1121,7 @@
             16461,
             10508,
             1,
-            41078,
+            35147,
             68236,
             39946,
             43654,
