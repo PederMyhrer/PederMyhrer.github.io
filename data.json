@@ -79,20 +79,6 @@
       "plannedMonth": ""
     },
     {
-      "id": 1775587613981,
-      "type": "wish",
-      "name": "Gardiner med oppheng",
-      "amount": 1500,
-      "plannedMonth": ""
-    },
-    {
-      "id": 1775587766144,
-      "type": "wish",
-      "name": "Weber Grill",
-      "amount": 3790,
-      "plannedMonth": ""
-    },
-    {
       "id": 1776239973448,
       "type": "buffer",
       "name": "Kostnadsbuffer",
@@ -158,7 +144,7 @@
             18500,
             19000,
             33680,
-            40000,
+            50000,
             25000,
             10000,
             10000,
@@ -168,6 +154,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -230,6 +220,10 @@
             "3": {
               "confirmed": true,
               "comment": ""
+            },
+            "4": {
+              "confirmed": true,
+              "comment": ""
             }
           }
         },
@@ -252,6 +246,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -400,6 +398,10 @@
             "3": {
               "confirmed": true,
               "comment": ""
+            },
+            "4": {
+              "confirmed": true,
+              "comment": ""
             }
           }
         },
@@ -422,6 +424,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -490,6 +496,10 @@
             "3": {
               "confirmed": true,
               "comment": ""
+            },
+            "4": {
+              "confirmed": true,
+              "comment": ""
             }
           }
         },
@@ -514,6 +524,10 @@
             "3": {
               "confirmed": true,
               "comment": ""
+            },
+            "4": {
+              "confirmed": true,
+              "comment": ""
             }
           }
         },
@@ -525,7 +539,7 @@
             1000,
             1000,
             1000,
-            600,
+            624,
             1000,
             1000,
             1000,
@@ -536,6 +550,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -549,7 +567,7 @@
             1513,
             1513,
             1513,
-            2500,
+            1868,
             2500,
             2500,
             3000,
@@ -560,6 +578,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -597,7 +619,7 @@
             299,
             299,
             301,
-            299,
+            302,
             299,
             299,
             299,
@@ -608,6 +630,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -621,7 +647,7 @@
             278,
             278,
             278,
-            278,
+            149,
             278,
             278,
             278,
@@ -632,6 +658,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -656,6 +686,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -754,6 +788,10 @@
             "3": {
               "confirmed": true,
               "comment": ""
+            },
+            "4": {
+              "confirmed": true,
+              "comment": ""
             }
           }
         },
@@ -776,6 +814,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -863,7 +905,7 @@
             0,
             0,
             0,
-            500,
+            800,
             0,
             0,
             0,
@@ -874,6 +916,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -887,7 +933,7 @@
             0,
             0,
             1000,
-            0,
+            718,
             0,
             0,
             0,
@@ -935,7 +981,7 @@
             500,
             500,
             1260,
-            500,
+            0,
             500,
             500,
             500,
@@ -959,7 +1005,7 @@
             0,
             0,
             30312,
-            0,
+            5446,
             0,
             0,
             0,
@@ -970,6 +1016,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -983,8 +1033,8 @@
             3880,
             2000,
             2000,
-            5000,
             2500,
+            5000,
             0,
             0,
             0,
@@ -994,6 +1044,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -1007,7 +1061,7 @@
             2000,
             1000,
             300,
-            300,
+            1000,
             300,
             300,
             300,
@@ -1018,6 +1072,10 @@
           ],
           "meta": {
             "3": {
+              "confirmed": true,
+              "comment": ""
+            },
+            "4": {
               "confirmed": true,
               "comment": ""
             }
@@ -1089,7 +1147,13 @@
             0,
             0,
             0
-          ]
+          ],
+          "meta": {
+            "4": {
+              "confirmed": true,
+              "comment": ""
+            }
+          }
         }
       ],
       "sparing": [
@@ -1222,6 +1286,10 @@
             "3": {
               "confirmed": true,
               "comment": ""
+            },
+            "4": {
+              "confirmed": false,
+              "comment": "Viktoria har lagt inn halvparten"
             }
           }
         },
@@ -1234,7 +1302,7 @@
             0,
             0,
             0,
-            0,
+            13884,
             0,
             0,
             0,
