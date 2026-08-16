@@ -65,27 +65,6 @@
   },
   "queueItems": [
     {
-      "id": 1782073334479,
-      "type": "wish",
-      "name": "justering",
-      "amount": 13000,
-      "plannedMonth": "Juni-2026"
-    },
-    {
-      "id": 1782073255176,
-      "type": "buffer",
-      "name": "Buffer",
-      "amount": 25000,
-      "plannedMonth": "Juni-2026"
-    },
-    {
-      "id": 1782073365203,
-      "type": "wish",
-      "name": "Xgimi",
-      "amount": 22500,
-      "plannedMonth": "September-2026"
-    },
-    {
       "id": 1782073401437,
       "type": "wish",
       "name": "Bil",
@@ -1487,7 +1466,7 @@
             61000,
             0,
             0,
-            0,
+            11500,
             0,
             0,
             0
