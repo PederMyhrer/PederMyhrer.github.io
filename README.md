@@ -28,6 +28,8 @@ Passordet kan ikke gjenopprettes. Bruk en lang setning, fire til fem tilfeldige 
 
 **Spareplan** (under Mål) bestemmer hvor mye som spares fremover: et beløp per måned, med endringer fra bestemte måneder. Målene fylles i prioritert rekkefølge, eller med fast beløp, og kan ha en startmåned. Tidslinjen viser når hvert mål nås og om fristen holder.
 
+**Julegaver** er ønskelister for Peder og Viktoria og gavelister for alle andre, med pris, lenke og status (idé, kjøpt, pakket). Velg «Jeg er» på hver enhet, så skjules det som er kjøpt fra din egen liste. Listen er ikke koblet til budsjettet.
+
 **Budsjett** er per måned og nullbasert: inntekter minus utgifter minus sparing skal bli 0. Sparelinjene peker på et sparemål, og det er her den månedlige sparingen bestemmes.
 
 ### Månedsrytme

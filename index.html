@@ -159,7 +159,7 @@ tr.sum td{font-weight:600;border-bottom:0}
 .line:hover,.line:focus-within{background:rgba(26,50,64,.6)}
 .line .nm{display:flex;flex-direction:column;min-width:0}
 .line .nt{font-size:.8rem;color:var(--text3)!important;padding-top:0!important;padding-bottom:3px!important;margin-top:-3px}
-.line:not(:focus-within) .nt:placeholder-shown{display:none}
+.line .nm:not(:focus-within) .nt:placeholder-shown{display:none}
 .line.zero .inl{color:var(--text3)}
 .line .del{opacity:0}
 .line:hover .del,.line:focus-within .del{opacity:1}
@@ -183,6 +183,25 @@ tr.sum td{font-weight:600;border-bottom:0}
 .pot .acts{display:flex;gap:6px;margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
 .newpot{border:1.5px dashed var(--line2);border-radius:16px;background:none;color:var(--text3);cursor:pointer;min-height:180px;font-weight:500}
 .newpot:hover{color:var(--brass);border-color:var(--brass)}
+
+/* ---------- julegaver ---------- */
+.nav .sh{display:none}
+.gline{display:grid;grid-template-columns:78px minmax(0,1fr) 110px 28px 28px;gap:6px;align-items:center;padding:3px 0;border-bottom:1px solid rgba(34,64,79,.55)}
+.gline .nm{display:flex;flex-direction:column;min-width:0}
+.gline .nm:not(:focus-within) .nt:placeholder-shown{display:none}
+.gline .nm:not(:focus-within) input[data-f=link]{display:none}
+.gline .nt{font-size:.8rem;color:var(--text3)!important;padding-top:0!important;padding-bottom:3px!important;margin-top:-3px}
+.gline .del{opacity:0} .gline:hover .del,.gline:focus-within .del{opacity:1}
+.gline.got .inl:not(.nt){color:var(--text2)}
+.gstat{border:0;border-radius:999px;padding:3px 0;font-size:.78rem;font-weight:600;cursor:pointer;width:72px;text-align:center}
+.gstat.s-ide{background:var(--raised);color:var(--text2)}
+.gstat.s-kjopt{background:var(--brass-soft);color:var(--brass)}
+.gstat.s-pakket{background:var(--sea-soft);color:var(--sea)}
+.wish .addline,.gperson .addline{padding-left:84px}
+.gpeople{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px}
+.gperson{padding-top:12px}
+.gperson header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.gperson .gname{font:600 1.08rem/1.2 var(--display);flex:1;padding-left:4px!important}
 
 /* ---------- plan ---------- */
 .sub2{font:600 1.15rem/1.2 var(--display);letter-spacing:-.01em;margin:6px 0 14px}
@@ -245,6 +264,13 @@ tr.sum td{font-weight:600;border-bottom:0}
   .side .brand,.side .foot{display:none}
   .nav{flex-direction:row;width:100%;justify-content:space-around}
   .nav button{flex-direction:column;gap:3px;font-size:.7rem;padding:6px 2px;flex:1;align-items:center}
+  .nav .lg{display:none} .nav .sh{display:inline}
+  .gpeople{grid-template-columns:1fr}
+  .gline{grid-template-columns:58px minmax(0,1fr) 70px 24px 22px;gap:3px}
+  .gstat{width:56px;font-size:.72rem}
+  .stats b{font-size:1.15rem}
+  .gline .del{opacity:.35}
+  .wish .addline,.gperson .addline{padding-left:62px}
   .nav button.on{background:none}
   .topbar{display:flex;align-items:center;gap:10px;padding:14px 16px 0}
   .topbar .brand{padding:0;font-size:1.2rem;flex:1}
@@ -365,9 +391,11 @@ const ICON = {
   right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 6 6 6-6 6"/></svg>',
   up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14.5 6-6 6 6"/></svg>',
   down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9.5 6 6 6-6"/></svg>',
+  jul: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5V20h14v-7.5M12 8.5V20M12 8.5C10 5 7 4.5 7 6.5S10 8.5 12 8.5ZM12 8.5c2-3.5 5-4 5-2s-3 2-5 2Z"/></svg>',
+  link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
   dots: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg>',
 };
-const TABS = [['oversikt', 'Oversikt'], ['budsjett', 'Budsjett'], ['mal', 'Mål'], ['kontoer', 'Kontoer'], ['innst', 'Innstillinger']];
+const TABS = [['oversikt', 'Oversikt'], ['budsjett', 'Budsjett'], ['mal', 'Mål'], ['jul', 'Julegaver', 'Jul'], ['kontoer', 'Kontoer'], ['innst', 'Innstillinger', 'Mer']];
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -707,8 +735,8 @@ function renderKeepFocus() {
 function render() {
   if (!S.state) return;
   S.sim = null;
-  $('#tabs').innerHTML = TABS.map(([id, l]) => `<button data-tab="${id}" class="${S.tab === id ? 'on' : ''}">${ICON[id]}<span>${l}</span></button>`).join('');
-  const fn = { oversikt: viewOverview, budsjett: viewBudget, mal: viewPots, kontoer: viewAccounts, innst: viewSettings }[S.tab];
+  $('#tabs').innerHTML = TABS.map(([id, l, sh]) => `<button data-tab="${id}" class="${S.tab === id ? 'on' : ''}">${ICON[id]}<span class="lg">${l}</span><span class="sh">${sh || l}</span></button>`).join('');
+  const fn = { oversikt: viewOverview, budsjett: viewBudget, mal: viewPots, jul: viewGifts, kontoer: viewAccounts, innst: viewSettings }[S.tab];
   $('#view').innerHTML = fn();
   if (S.tab === 'oversikt') drawProjection();
   if (S.tab === 'mal') drawTimeline();
@@ -979,6 +1007,70 @@ function viewPots() {
     <button class="newpot" data-act="potform">+ Nytt mål</button></div>`;
 }
 
+/* ---------- JULEGAVER ----------
+   Egen liste, ikke koblet til budsjettet. Personer er felles for alle år, gavene hører til et år.
+   «Jeg er» lagres bare på denne enheten og skjuler kjøpt-status på ens egen ønskeliste. */
+const GSTAT = { ide: 'Idé', kjopt: 'Kjøpt', pakket: 'Pakket' };
+const GNEXT = { ide: 'kjopt', kjopt: 'pakket', pakket: 'ide' };
+function ensureGifts() {
+  const s = st();
+  if (!s.gifts) s.gifts = { people: [{ id: 'g_peder', name: 'Peder', self: 'peder' }, { id: 'g_viktoria', name: 'Viktoria', self: 'viktoria' }], items: [] };
+  return s.gifts;
+}
+const giftYear = () => S.giftYear || new Date().getFullYear();
+const meNow = () => lsGet('okonomi.me') || '';
+const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : '';
+function giftLine(it, hideStatus) {
+  const url = safeUrl(it.link);
+  return `<div class="gline ${it.status !== 'ide' && !hideStatus ? 'got' : ''}">
+    ${hideStatus ? `<span class="chip" title="Skjult for deg, så overraskelsen holder">Hemmelig</span>` : `<button class="gstat s-${it.status}" data-act="gstat" data-id="${it.id}" title="Trykk for å endre status">${GSTAT[it.status]}</button>`}
+    <div class="nm"><input class="inl" type="text" data-gi="${it.id}" data-f="title" data-k="gt:${it.id}" value="${esc(it.title)}" placeholder="Hva?" aria-label="Gave">
+      <input class="inl nt" type="text" data-gi="${it.id}" data-f="note" data-k="gn:${it.id}" value="${esc(it.note)}" placeholder="Notat, størrelse, farge" aria-label="Notat">
+      <input class="inl nt" type="url" data-gi="${it.id}" data-f="link" data-k="gl:${it.id}" value="${esc(it.link)}" placeholder="Lenke til butikk" aria-label="Lenke"></div>
+    <input class="inl amt num" type="text" inputmode="decimal" data-gi="${it.id}" data-f="price" data-k="gp:${it.id}" value="${esc(numStr(it.price))}" placeholder="Pris" aria-label="Pris">
+    ${url ? `<a class="iconbtn" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="Åpne lenken" aria-label="Åpne lenken">${ICON.link}</a>` : '<span></span>'}
+    <button class="iconbtn del" data-act="gdel" data-id="${it.id}" tabindex="-1" aria-label="Slett" title="Slett">${ICON.x}</button>
+  </div>`;
+}
+function viewGifts() {
+  const G = ensureGifts(), y = giftYear(), me = meNow(), items = G.items.filter(i => i.year === y);
+  const selfs = G.people.filter(p => p.self), others = G.people.filter(p => !p.self);
+  const forOthers = items.filter(i => others.some(p => p.id === i.personId));
+  const bought = forOthers.filter(i => i.status !== 'ide');
+  const sumAll = sum(forOthers, i => i.price), sumBought = sum(bought, i => i.price);
+  const prev = G.items.filter(i => i.year === y - 1 && i.status === 'ide').length;
+  const wish = p => {
+    const its = items.filter(i => i.personId === p.id), hide = me && me === p.self;
+    return `<section class="panel wish"><h2>${esc(p.name)} ønsker seg<span class="sp"></span>${hide ? '<span class="chip">Din liste</span>' : ''}</h2>
+      ${its.map(i => giftLine(i, hide)).join('') || `<p class="muted small" style="margin:0 0 6px">Ingen ønsker ennå.</p>`}
+      <button class="addline" data-act="gadd" data-id="${p.id}">+ Legg til ønske</button></section>`;
+  };
+  const person = p => {
+    const its = items.filter(i => i.personId === p.id), done = its.filter(i => i.status !== 'ide').length;
+    return `<section class="panel gperson">
+      <header><input class="inl gname" type="text" data-gp="${p.id}" data-k="gpn:${p.id}" value="${esc(p.name)}" placeholder="Navn" aria-label="Navn">
+        <span class="small muted num">${its.length ? `${done} av ${its.length} kjøpt` : ''}${sum(its, i => i.price) ? ', ' + kr(sum(its, i => i.price)) : ''}</span>
+        <button class="iconbtn" data-act="gpdel" data-id="${p.id}" aria-label="Fjern ${esc(p.name)}" title="Fjern person">${ICON.x}</button></header>
+      ${its.map(i => giftLine(i, false)).join('')}
+      <button class="addline" data-act="gadd" data-id="${p.id}">+ Legg til gave</button></section>`;
+  };
+  return `<div class="pagehead"><h1>Julegaver</h1>
+    <div class="mnav"><button class="iconbtn" data-act="gyear" data-d="-1" aria-label="Forrige år">${ICON.left}</button><b style="min-width:70px">${y}</b><button class="iconbtn" data-act="gyear" data-d="1" aria-label="Neste år">${ICON.right}</button></div>
+    <span class="sp"></span>
+    <label class="row small muted" style="gap:6px">Jeg er<select id="gme" style="width:auto">${[['', 'Velg'], ['peder', 'Peder'], ['viktoria', 'Viktoria']].map(([v, l]) => `<option value="${v}" ${me === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label></div>
+  ${!me ? `<div class="callout info" style="margin:-6px 0 16px"><span class="sp">Velg hvem du er, så skjules det som er kjøpt fra din egen ønskeliste. Valget gjelder bare denne enheten.</span></div>` : ''}
+  <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+    <div><span>Gaver til andre</span><b class="num">${forOthers.length}</b><small>${others.length} personer</small></div>
+    <div><span>Kjøpt</span><b class="num">${bought.length} av ${forOthers.length}</b><small>${forOthers.filter(i => i.status === 'pakket').length} pakket</small></div>
+    <div><span>Kostnad</span><b class="num">${kr(sumAll)}</b><small>${kr(sumBought)} er kjøpt</small></div>
+  </div>
+  ${!items.length && prev ? `<div class="callout" style="margin:0 0 16px"><span class="sp">${prev} gaveidéer fra ${y - 1} ble ikke kjøpt.</span><button class="btn sm" data-act="gcarry">Ta dem med til ${y}</button></div>` : ''}
+  <h2 class="sub2">Ønskelister</h2>
+  <div class="grid2" style="margin-bottom:22px">${selfs.map(wish).join('')}</div>
+  <h2 class="sub2">Gaver til andre</h2>
+  <div class="gpeople">${others.map(person).join('')}<button class="newpot" data-act="gpadd" style="min-height:120px">+ Ny person</button></div>`;
+}
+
 /* ---------- KONTOER ---------- */
 function viewAccounts() {
   const t = totals(), A = st().accounts;
@@ -1024,6 +1116,13 @@ function viewSettings() {
    ============================================================ */
 const curB = () => st().budgets[S.budgetMonth];
 const ACT = {
+  gyear: el => { S.giftYear = giftYear() + +el.dataset.d; render(); },
+  gadd: el => { const it = { id: uid('gi'), personId: el.dataset.id, year: giftYear(), title: '', price: 0, link: '', note: '', status: 'ide' }; ensureGifts().items.push(it); changed(); setTimeout(() => $(`[data-k="gt:${it.id}"]`)?.focus(), 0); },
+  gdel: el => { checkpoint(); const G = ensureGifts(), it = G.items.find(i => i.id === el.dataset.id); G.items = G.items.filter(i => i !== it); changed(); toast(`«${it.title || 'Gaven'}» er slettet`, true); },
+  gstat: el => { const it = ensureGifts().items.find(i => i.id === el.dataset.id); it.status = GNEXT[it.status] || 'ide'; changed(); },
+  gpadd: () => { const p = { id: uid('gp'), name: '' }; ensureGifts().people.push(p); changed(); setTimeout(() => $(`[data-k="gpn:${p.id}"]`)?.focus(), 0); },
+  gpdel: el => { checkpoint(); const G = ensureGifts(), p = G.people.find(x => x.id === el.dataset.id); G.people = G.people.filter(x => x !== p); G.items = G.items.filter(i => i.personId !== p.id); changed(); toast(`«${p.name || 'Personen'}» og gavene er fjernet`, true); },
+  gcarry: () => { const G = ensureGifts(), y = giftYear(); G.items.filter(i => i.year === y - 1 && i.status === 'ide').forEach(i => G.items.push({ ...i, id: uid('gi'), year: y })); changed(); toast('Idéene er tatt med til ' + y, true); },
   pmove: el => { const P = ensurePlan(), i = P.order.indexOf(el.dataset.id), j = i + +el.dataset.d; if (j < 0 || j >= P.order.length) return; [P.order[i], P.order[j]] = [P.order[j], P.order[i]]; changed(); },
   capadd: () => { const P = ensurePlan(), last = P.capacity[P.capacity.length - 1], base = last.from > planStart() ? last.from : planStart(); P.capacity.push({ from: ymAdd(base, 6), amount: last.amount }); changed(); },
   buftarget: el => { const p = pot(el.dataset.id); p.target = +el.dataset.v; changed(); toast(p.name + ' har fått målbeløp ' + kr(p.target)); },
@@ -1225,6 +1324,13 @@ document.addEventListener('change', async e => {
     else l[f] = el.value.trim();
     changed({ soft: f === 'amount' || f === 'potId', noRender: f === 'name' || f === 'note' });
   }
+  if (el.dataset.gi) {
+    const it = ensureGifts().items.find(i => i.id === el.dataset.gi); if (!it) return;
+    const f = el.dataset.f; it[f] = f === 'price' ? parseNum(el.value) : el.value.trim();
+    changed({ soft: f === 'price' || f === 'link' , noRender: f === 'title' || f === 'note' });
+  }
+  if (el.dataset.gp) { const p = ensureGifts().people.find(x => x.id === el.dataset.gp); if (p) { p.name = el.value.trim(); changed({ noRender: true }); } }
+  if (el.id === 'gme') { lsSet('okonomi.me', el.value || null); render(); }
   if (el.dataset.prule) {
     const R = ensurePlan().rules[el.dataset.id], f = el.dataset.prule;
     if (f === 'mode') R.mode = el.value; else if (f === 'amount') R.amount = parseNum(el.value); else R.start = el.value || null;
