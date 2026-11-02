@@ -30,6 +30,8 @@ Passordet kan ikke gjenopprettes. Bruk en lang setning, fire til fem tilfeldige 
 
 **Julegaver** er ønskelister for Peder og Viktoria og gavelister for alle andre, med pris, lenke og status (idé, kjøpt, pakket). Velg «Jeg er» på hver enhet, så skjules det som er kjøpt fra din egen liste. Listen er ikke koblet til budsjettet.
 
+**Overtid** regner ut netto ekstra lønn for et antall overtidstimer: timelønn (årslønn delt på timer i et årsverk), pluss overtidstillegg, ganger timer, minus skatt. Hvert steg rundes til øre. Beregninger kan lagres i en logg med dato og notat.
+
 **Budsjett** er per måned og nullbasert: inntekter minus utgifter minus sparing skal bli 0. Sparelinjene peker på et sparemål, og det er her den månedlige sparingen bestemmes.
 
 ### Månedsrytme
