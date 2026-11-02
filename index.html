@@ -186,6 +186,7 @@ tr.sum td{font-weight:600;border-bottom:0}
 
 /* ---------- overtid ---------- */
 .othours{font:650 1.6rem/1.2 var(--display)!important;padding:10px 12px!important}
+.otin{display:grid;grid-template-columns:1fr 110px;gap:10px}
 .otbig{padding:14px 16px;border-radius:12px;background:var(--sea-soft);margin:4px 0 14px}
 .otbig span{display:block;color:var(--text2);font-size:.88rem}
 .otbig b{display:block;font:680 2.2rem/1.1 var(--display);letter-spacing:-.03em;color:var(--sea);margin:2px 0}
@@ -1086,7 +1087,7 @@ function viewGifts() {
    Timelønn = årslønn / timer i et årsverk. Overtidssats = timelønn + tillegg. Netto = brutto minus skatt. */
 function ensureOT() {
   const s = st();
-  if (!s.overtime) s.overtime = { salary: 667000, hoursYear: 1850, pct: 50, tax: 30, entries: [] };
+  if (!s.overtime) s.overtime = { salary: 667000, hoursYear: 1850, pct: 50, tax: 28, entries: [] };
   return s.overtime;
 }
 const kr2 = n => (n || 0).toLocaleString('nb-NO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kr';
@@ -1129,18 +1130,18 @@ function viewOvertime() {
   return `<div class="pagehead"><h1>Overtid</h1></div>
   <div class="grid2" style="margin-bottom:18px">
     <section class="panel"><h2>Beregn</h2>
-      <label class="f"><span>Antall overtidstimer</span><input type="text" inputmode="decimal" id="ot-hours" class="othours" value="${esc(h0)}" placeholder="For eksempel 8,17 eller 8:10" autocomplete="off"></label>
+      <div class="otin">
+        <label class="f"><span>Antall overtidstimer</span><input type="text" inputmode="decimal" id="ot-hours" class="othours" value="${esc(h0)}" placeholder="0" autocomplete="off"></label>
+        <label class="f"><span>Skatt, %</span><input type="text" inputmode="decimal" class="othours amt" data-ot="tax" value="${esc(dec2(O.tax))}" autocomplete="off" aria-label="Skatteprosent"></label>
+      </div>
       <div id="otres">${otResult(parseHours(h0))}</div>
       <div class="row" style="margin-top:14px"><input type="date" id="ot-date" value="${todayISO()}" style="width:auto"><input type="text" id="ot-note" placeholder="Notat (valgfritt)" style="flex:1;min-width:140px"><button class="btn primary" data-act="otsave">Lagre i loggen</button></div>
     </section>
     <section class="panel"><h2>Forutsetninger</h2>
       <label class="f"><span>Årslønn (brutto)</span><input type="text" inputmode="decimal" class="amt" data-ot="salary" value="${esc(numStr(O.salary))}"></label>
       <label class="f"><span>Timer i et årsverk</span><input type="text" inputmode="decimal" class="amt" data-ot="hoursYear" value="${esc(dec2(O.hoursYear))}"></label>
-      <div class="f2">
-        <label class="f"><span>Overtidstillegg, %</span><input type="text" inputmode="decimal" class="amt" data-ot="pct" value="${esc(dec2(O.pct))}"></label>
-        <label class="f"><span>Skatt på overtid, %</span><input type="text" inputmode="decimal" class="amt" data-ot="tax" value="${esc(dec2(O.tax))}"></label>
-      </div>
-      <p class="small muted" style="margin:0">Skatten er en forenkling. Den faktiske trekket avhenger av skattekortet, så tallet er et anslag. Endringer her gjelder nye beregninger, ikke det som allerede ligger i loggen.</p>
+      <label class="f"><span>Overtidstillegg, %</span><input type="text" inputmode="decimal" class="amt" data-ot="pct" value="${esc(dec2(O.pct))}"></label>
+      <p class="small muted" style="margin:0">Skatteprosenten står ved siden av timene. Sjekk trekket på lønnsslippen eller skattekortet, så blir tallet riktig. Endringer her gjelder nye beregninger, ikke det som allerede ligger i loggen.</p>
     </section>
   </div>
   <section class="panel"><h2>Logg<span class="sp"></span>${yearE.length ? `<span class="small muted num">${y}: ${dec2(sum(yearE, e => e.hours))} timer, ${kr(sum(yearE, e => e.net))} netto</span>` : ''}</h2>
@@ -1446,7 +1447,9 @@ document.addEventListener('change', async e => {
     } catch (err) { modal('Import feilet', `<p>${esc(err.message)}</p>`, [], { cancel: 'Lukk' }); }
   }
 });
-document.addEventListener('input', e => { if (e.target.id === 'ot-hours') { S.otHours = e.target.value; $('#otres').innerHTML = otResult(parseHours(e.target.value)); } });
+document.addEventListener('input', e => {
+  if (e.target.dataset.ot === 'tax') { const v = parseNum(e.target.value); if (v >= 0 && v < 100) { ensureOT().tax = v; $('#otres').innerHTML = otResult(parseHours($('#ot-hours').value)); } }
+  if (e.target.id === 'ot-hours') { S.otHours = e.target.value; $('#otres').innerHTML = otResult(parseHours(e.target.value)); } });
 document.addEventListener('focusout', e => { if (e.target.matches('#modal-box input.amt')) { const v = parseNum(e.target.value); e.target.value = v ? numStr(v) : ''; } });
 document.addEventListener('keydown', e => {
   const open = !$('#modal').classList.contains('hidden');
