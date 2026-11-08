@@ -1161,7 +1161,7 @@ function viewAccounts() {
       <div><b>${esc(a.name)}</b><span class="note">${T.label || ''}${a.updated ? ', oppdatert ' + dateNo(a.updated) : ''}</span></div>
       <input class="inl amt num" type="text" inputmode="decimal" data-accbal="${a.id}" data-k="ab:${a.id}" value="${esc((a.type === 'gjeld' && a.balance ? '-' : '') + numStr(a.balance))}" placeholder="0" aria-label="Saldo for ${esc(a.name)}">
       <span class="n num hs">${T.pots ? kr(allocated(a.id)) : ''}</span>
-      <span class="n num hs ${u != null && u < -0.5 ? 'neg' : u > 0.5 && countsFree(a) ? 'warn' : ''}">${u != null ? kr(u) : ''}</span>
+      <span class="n num hs ${u != null && u < -0.5 ? 'neg' : u > 0.5 && countsFree(a) ? 'warn' : ''}">${u != null && u > 0.5 && countsFree(a) && st().pots.length ? `<button class="btn sm ghost warn" style="padding:2px 6px" data-act="distribute" data-id="${a.id}" title="Fordel på mål">${kr(u)}</button>` : u != null ? kr(u) : ''}</span>
       <button class="iconbtn" data-act="accform" data-id="${a.id}" aria-label="Rediger ${esc(a.name)}" title="Rediger">${ICON.dots}</button></div>`; }).join('') || '<p class="muted" style="padding:10px 18px">Ingen kontoer ennå.</p>'}
     <div class="acc total"><span>Nettoformue</span><span class="n num" style="padding-right:9px">${kr(t.net)}</span><span class="hs"></span><span class="n num hs">${kr(t.free)}</span><span></span></div>
   </section>
@@ -1327,19 +1327,34 @@ const ACT = {
         changed(); toast(`${kr(v)} flyttet fra ${f.name} til ${t.name}`, true);
       } }]);
   },
-  distribute: () => {
-    const accs = st().accounts.filter(a => countsFree(a) && unalloc(a.id) > 0.5 && potsIn(a.id).length);
-    if (!accs.length) return modal('Ingenting å fordele', '<p>Alle pengene har allerede en jobb, eller kontoen har ingen mål ennå.</p>', [], { cancel: 'Lukk' });
-    const a = accs[0], ps = potsIn(a.id), free = unalloc(a.id);
-    modal('Fordel ' + kr(free), `<p class="small muted" style="margin-top:0">Fra ${esc(a.name)}. Skriv hvor mye hvert mål skal få. Det som blir igjen, står som ikke fordelt.</p>
-      <table><tbody>${ps.map(p => `<tr><td><i class="sw" style="background:${potColor(p)}"></i> ${esc(p.name)}<span class="note">Har ${kr(p.balance)}${p.target ? ' av ' + kr(p.target) : ''}</span></td><td style="width:140px">${amtInput('d_' + p.id, 0)}</td></tr>`).join('')}
-      <tr class="sum"><td>Igjen</td><td class="n num" id="dist-left">${kr(free)}</td></tr></tbody></table>`,
+  distribute: el => {
+    // Fordel ledige penger fra én konto til hvilke som helst mål. Ligger målet på en annen konto, flyttes saldoen dit også.
+    const accs = st().accounts.filter(a => countsFree(a) && unalloc(a.id) > 0.5);
+    if (!accs.length) return modal('Ingenting å fordele', '<p>Alle pengene har allerede en jobb.</p>', [], { cancel: 'Lukk' });
+    if (!st().pots.length) return modal('Ingen mål ennå', '<p>Lag et mål først, så kan pengene fordeles dit.</p>', [{ label: 'Nytt mål', cls: 'primary', act: () => { setTimeout(() => ACT.potform({ dataset: {} }), 10); } }]);
+    const a = accs.find(x => x.id === el?.dataset?.id) || accs[0], free = unalloc(a.id);
+    const ps = sim().order.slice().sort((x, y) => (x.accountId === a.id ? 0 : 1) - (y.accountId === a.id ? 0 : 1));
+    modal('Fordel ' + kr(free), `
+      ${accs.length > 1 ? `<label class="f"><span>Ta pengene fra</span><select id="dist-src">${accs.map(x => `<option value="${x.id}" ${x === a ? 'selected' : ''}>${esc(x.name)}: ${kr(unalloc(x.id))} ledig</option>`).join('')}</select></label>`
+        : `<p class="small muted" style="margin-top:0">Fra ${esc(a.name)}.</p>`}
+      <p class="small muted" style="margin-top:0">Skriv hvor mye hvert mål skal få. Det som blir igjen, står som ikke fordelt.</p>
+      <table><tbody>${ps.map(p => { const other = p.accountId !== a.id ? acc(p.accountId) : null; return `<tr><td><i class="sw" style="background:${potColor(p)}"></i> ${esc(p.name)}<span class="note">Har ${kr(p.balance)}${p.target ? ' av ' + kr(p.target) : ''}${other ? `. Ligger på ${esc(other.name)}, så beløpet flyttes dit` : ''}</span></td><td style="width:140px">${amtInput('d_' + p.id, 0)}</td></tr>`; }).join('')}
+      <tr class="sum"><td>Igjen</td><td class="n num" id="dist-left">${kr(free)}</td></tr></tbody></table>
+      ${ps.some(p => p.accountId !== a.id) ? '<p class="small muted">Husk å overføre i nettbanken det som går til mål på en annen konto.</p>' : ''}`,
       [{ label: 'Fordel', cls: 'primary', act: box => {
-        const vals = ps.map(p => [p, parseNum(mval(box, 'd_' + p.id))]);
-        if (sum(vals, v => v[1]) > free + 0.5) return merr(box, 'Du har fordelt mer enn det som er ledig.');
-        checkpoint(); vals.forEach(([p, v]) => p.balance += v); changed(); toast(kr(sum(vals, v => v[1])) + ' er fordelt', true);
+        const vals = ps.map(p => [p, parseNum(mval(box, 'd_' + p.id))]).filter(v => v[1]);
+        if (!vals.length) return merr(box, 'Skriv inn minst ett beløp.');
+        if (sum(vals, v => v[1]) > free + 0.5) return merr(box, 'Du har fordelt mer enn det som er ledig på ' + a.name + '.');
+        checkpoint();
+        vals.forEach(([p, v]) => {
+          p.balance += v;
+          if (p.accountId !== a.id) { const d = acc(p.accountId); a.balance -= v; a.updated = todayISO(); if (d) { d.balance += v; d.updated = todayISO(); } }
+        });
+        changed(); toast(kr(sum(vals, v => v[1])) + ' er fordelt', true);
       } }]);
-    $('#modal-box .mbody').addEventListener('input', () => { const left = free - sum(ps, p => parseNum(mval($('#modal-box'), 'd_' + p.id))); const e2 = $('#dist-left'); if (e2) { e2.textContent = kr(left); e2.className = 'n num ' + (left < -0.5 ? 'neg' : Math.abs(left) < 0.5 ? 'pos' : ''); } });
+    const body = $('#modal-box .mbody');
+    body.addEventListener('input', () => { const left = free - sum(ps, p => parseNum(mval($('#modal-box'), 'd_' + p.id))); const e2 = $('#dist-left'); if (e2) { e2.textContent = kr(left); e2.className = 'n num ' + (left < -0.5 ? 'neg' : Math.abs(left) < 0.5 ? 'pos' : ''); } });
+    $('#dist-src')?.addEventListener('change', e => ACT.distribute({ dataset: { id: e.target.value } }));
   },
   accform: el => {
     const a = el.dataset.id ? acc(el.dataset.id) : null;
