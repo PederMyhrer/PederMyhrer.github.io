@@ -721,7 +721,7 @@ const mval = (box, name) => box.querySelector(`[name="${name}"]`)?.value ?? '';
 const merr = (box, msg) => { let el = box.querySelector('.merr'); if (!el) { el = document.createElement('p'); el.className = 'merr neg small'; box.querySelector('.mbody').appendChild(el); } el.textContent = msg; return false; };
 const amtInput = (name, v, ph = '0') => `<input type="text" inputmode="decimal" class="amt" name="${name}" value="${esc(numStr(v))}" placeholder="${ph}" autocomplete="off">`;
 const potOptions = (sel, filter = () => true) => st().pots.filter(filter).map(p => `<option value="${p.id}" ${p.id === sel ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
-const accOptions = (sel, onlyPots) => st().accounts.filter(a => !onlyPots || ACC_TYPES[a.type]?.pots).map(a => `<option value="${a.id}" ${a.id === sel ? 'selected' : ''}>${esc(a.name)}</option>`).join('');
+const accOptions = (sel, onlyPots) => st().accounts.filter(a => !onlyPots || ACC_TYPES[a.type]?.pots || a.id === sel).map(a => `<option value="${a.id}" ${a.id === sel ? 'selected' : ''}>${esc(a.name)}</option>`).join('');
 
 let toastTimer;
 function toast(msg, undoable) {
@@ -1362,17 +1362,24 @@ const ACT = {
       <label class="f"><span>Navn</span><input type="text" name="name" value="${esc(a?.name)}" placeholder="For eksempel Sparekonto, Aksjesparekonto eller Boliglån"></label>
       <div class="f2"><label class="f"><span>Type</span><select name="type">${Object.entries(ACC_TYPES).map(([k, T]) => `<option value="${k}" ${(a?.type || 'sparing') === k ? 'selected' : ''}>${T.label}</option>`).join('')}</select></label>
       <label class="f"><span>Saldo (gjeld som positivt tall)</span>${amtInput('bal', a?.balance)}</label></div>
+      <p class="small muted" id="acc-type-help" style="margin:-4px 0 12px"></p>
       <label class="f"><span>Notat</span><input type="text" name="note" value="${esc(a?.note)}" placeholder="Bank, rente eller lignende"></label>`,
       [...(a ? [{ label: 'Slett konto', cls: 'ghost danger', left: true, act: () => {
         if (potsIn(a.id).length) { setTimeout(() => modal('Kan ikke slette', `<p>${esc(a.name)} har ${potsIn(a.id).length} mål. Flytt eller slett målene først.</p>`, [], { cancel: 'Lukk' }), 10); return true; }
         checkpoint(); st().accounts = st().accounts.filter(x => x !== a); changed(); toast(`«${a.name}» er slettet`, true); } }] : []),
        { label: a ? 'Lagre' : 'Legg til konto', cls: 'primary', act: box => {
         const name = mval(box, 'name').trim(); if (!name) return merr(box, 'Gi kontoen et navn.');
+        const nt = mval(box, 'type');
+        if (a && potsIn(a.id).length && !ACC_TYPES[nt]?.pots) return merr(box, `${a.name} har ${potsIn(a.id).length} sparemål. Flytt målene til en annen konto før du gjør den til ${ACC_TYPES[nt].label.toLowerCase()}.`);
         const q = a || { id: uid('a') }, nb = Math.abs(parseNum(mval(box, 'bal')));
         if (!a || q.balance !== nb) q.updated = todayISO();
         Object.assign(q, { name, type: mval(box, 'type'), balance: nb, note: mval(box, 'note').trim() });
         if (!a) st().accounts.push(q); changed(); toast(a ? 'Lagret' : `«${name}» er lagt til`);
       } }]);
+    const help = () => { const T = ACC_TYPES[mval($('#modal-box'), 'type')]; $('#acc-type-help').textContent = T.pots
+      ? 'Kan ha sparemål, og ledige penger her kan fordeles på mål.'
+      : (T.asset ? 'Teller i nettoformuen, men kan ikke ha sparemål. Bruk den for verdien av bolig, bil og lignende.' : 'Trekkes fra nettoformuen. Kan ikke ha sparemål.'); };
+    help(); $('#modal-box [name=type]').addEventListener('change', help);
   },
   tokenform: () => modal('GitHub-token', `
     <ol class="small" style="padding-left:18px;margin-top:0">
