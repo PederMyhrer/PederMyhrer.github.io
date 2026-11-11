@@ -32,6 +32,8 @@ Passordet kan ikke gjenopprettes. Bruk en lang setning, fire til fem tilfeldige 
 
 **Overtid** regner ut netto ekstra lønn for et antall overtidstimer: timelønn (årslønn delt på timer i et årsverk), pluss overtidstillegg, ganger timer, minus skatt. Hvert steg rundes til øre. Beregninger kan lagres i en logg med dato og notat.
 
+**Innkjøp** er lister over ting som skal skaffes, delt i kategorier, med pris, viktighet, om det trengs nå eller kan vente, og status (mangler, kjøpt, fått, arvet, lånt). Lister kan importeres og eksporteres som fil. På mobil ligger Julegaver, Overtid, Kontoer og Innstillinger under «Mer».
+
 **Budsjett** er per måned og nullbasert: inntekter minus utgifter minus sparing skal bli 0. Sparelinjene peker på et sparemål, og det er her den månedlige sparingen bestemmes.
 
 ### Månedsrytme
